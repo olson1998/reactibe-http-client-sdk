@@ -12,6 +12,7 @@
     <modules>
         <module>reactive-http-client</module>
         <module>reactive-http-model</module>
+        <module>reactive-netty-http-client</module>
     </modules>
 
     <properties>

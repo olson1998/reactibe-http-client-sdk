@@ -2,7 +2,6 @@ package com.github.olson1998.http.contract;
 
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
-import org.reactivestreams.Publisher;
 
 import java.net.URI;
 import java.util.*;
@@ -10,7 +9,7 @@ import java.util.stream.Collectors;
 
 import static java.util.Map.entry;
 
-public record HttpRequestMessage(URI uri, String httpMethod, Map<String, List<String>> httpHeaders, Publisher<?> body) implements HttpInputMessage {
+public record HttpRequestMessage(URI uri, String httpMethod, Map<String, List<String>> httpHeaders, byte[] body) implements HttpInputMessage {
 
     public static Builder builder(){
         return new Builder();
@@ -23,7 +22,7 @@ public record HttpRequestMessage(URI uri, String httpMethod, Map<String, List<St
 
         private String httpMethod;
 
-        private Publisher<?> body;
+        private byte[] body;
 
         private final Map<String, List<String>> httpHeaders = new HashMap<>();
 
@@ -66,8 +65,8 @@ public record HttpRequestMessage(URI uri, String httpMethod, Map<String, List<St
         }
 
         @Override
-        public HttpInputMessage.Builder body(Publisher<?> body) {
-            this.body = body;
+        public HttpInputMessage.Builder body(byte[] requestBody) {
+            this.body = requestBody;
             return this;
         }
 

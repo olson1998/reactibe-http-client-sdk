@@ -3,6 +3,8 @@ package com.github.olson1998.http.contract;
 import org.reactivestreams.Publisher;
 
 import java.net.URI;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.util.List;
 import java.util.Map;
 
@@ -14,7 +16,7 @@ public interface HttpInputMessage {
 
     Map<String, List<String>> httpHeaders();
 
-    Publisher<?> body();
+    byte[] body();
 
     static Builder builder(){
         return new HttpRequestMessage.Builder();
@@ -30,7 +32,7 @@ public interface HttpInputMessage {
 
         Builder addHttpHeaders(String httpHeader, Iterable<String> headerValues);
 
-        Builder body(Publisher<?> body);
+        Builder body(byte[] requestBody);
 
         HttpInputMessage build();
     }

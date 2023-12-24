@@ -1,6 +1,6 @@
 package com.github.olson1998.http.nettyclient.util;
 
-import com.github.olson1998.http.serial.ContentSerializer;
+import com.github.olson1998.http.serialization.ContentSerializer;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.http.HttpHeaders;

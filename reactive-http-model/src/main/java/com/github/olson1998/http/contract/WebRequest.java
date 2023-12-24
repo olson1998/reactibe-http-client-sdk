@@ -1,14 +1,13 @@
 package com.github.olson1998.http.contract;
 
-import org.reactivestreams.Publisher;
+import com.github.olson1998.http.serialization.ContentSerializer;
 
 import java.net.URI;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 
-public interface HttpInputMessage {
+public interface WebRequest {
 
     URI uri();
 
@@ -16,10 +15,10 @@ public interface HttpInputMessage {
 
     Map<String, List<String>> httpHeaders();
 
-    byte[] body();
+    Duration timeoutDuration();
 
     static Builder builder(){
-        return new HttpRequestMessage.Builder();
+        return new ClientHttpRequest.Builder();
     }
 
     interface Builder{
@@ -32,8 +31,8 @@ public interface HttpInputMessage {
 
         Builder addHttpHeaders(String httpHeader, Iterable<String> headerValues);
 
-        Builder body(byte[] requestBody);
+        Builder timeoutDuration(Duration duration);
 
-        HttpInputMessage build();
+        WebRequest build();
     }
 }

@@ -1,18 +1,22 @@
 package com.github.olson1998.http.client;
 
-import com.github.olson1998.http.contract.HttpInputMessage;
-import com.github.olson1998.http.contract.HttpOutputMessage;
-import com.github.olson1998.http.serial.ContentSerializer;
+import com.github.olson1998.http.contract.WebRequest;
+import com.github.olson1998.http.contract.WebResponse;
+import com.github.olson1998.http.serialization.ContentDeserializer;
+import com.github.olson1998.http.serialization.ContentSerializer;
 import reactor.core.publisher.Mono;
-
-import java.time.Duration;
 
 public interface ReactiveHttpRequestExecutor {
 
-    Mono<HttpOutputMessage> executeHttpRequest(HttpInputMessage httpInputMessage);
+    <C> Mono<WebResponse<C>> executeHttpRequest(WebRequest webRequest, ContentDeserializer<C> contentDeserializer);
 
-    Mono<HttpOutputMessage> executeHttpRequest(HttpInputMessage httpInputMessage, Duration timeoutDuration);
+    <T, C> Mono<WebResponse<C>> executeHttpRequest(WebRequest webRequest,T content, ContentSerializer<T> contentSerializer, ContentDeserializer<C> contentDeserializer);
 
-    <T> Mono<HttpOutputMessage> executeHttpRequest(HttpInputMessage httpInputMessage, ContentSerializer<T> contentSerializer, T content, Duration timeoutDuration);
+    Mono<WebResponse<byte[]>> executeHttpRequestForResponseBodyBytes(WebRequest webRequest);
 
+    <T> Mono<WebResponse<byte[]>> executeHttpRequestForResponseBodyBytes(WebRequest webRequest,T content, ContentSerializer<T> contentSerializer);
+
+    Mono<WebResponse<Void>> executeHttpRequestForNoResponseBody(WebRequest webRequest);
+
+    <T> Mono<WebResponse<Void>> executeHttpRequestForNoResponseBody(WebRequest webRequest,T content, ContentSerializer<T> contentSerializer);
 }

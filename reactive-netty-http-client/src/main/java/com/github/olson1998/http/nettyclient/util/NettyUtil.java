@@ -5,6 +5,7 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.http.HttpHeaders;
 import lombok.experimental.UtilityClass;
+import org.apache.http.entity.ContentType;
 import org.reactivestreams.Publisher;
 import reactor.netty.ByteBufMono;
 
@@ -35,8 +36,8 @@ public class NettyUtil {
         return transformToReadOnly(readWriteHttpHeaders);
     }
 
-    public static <C> Publisher<ByteBuf> createContentPublisher(ContentSerializer<C> contentSerializer, C content){
-        var serializationFuture = CompletableFuture.supplyAsync(()-> contentSerializer.serialize().apply(content))
+    public static <C> Publisher<ByteBuf> createContentPublisher(ContentSerializer contentSerializer, ContentType contentType, C content){
+        var serializationFuture = CompletableFuture.supplyAsync(()-> contentSerializer.serialize().apply(content, contentType))
                 .thenApplyAsync(Unpooled::copiedBuffer);
         return ByteBufMono.fromFuture(serializationFuture);
     }

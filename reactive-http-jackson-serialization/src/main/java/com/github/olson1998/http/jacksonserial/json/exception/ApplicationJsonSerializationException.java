@@ -1,11 +1,15 @@
 package com.github.olson1998.http.jacksonserial.json.exception;
 
-public class ApplicationJsonSerializationException extends RuntimeException {
+import com.github.olson1998.http.exception.ContentSerializationException;
+import org.apache.http.entity.ContentType;
 
-    private static final String MESSAGE = "Failed to serialize: 'application/json'";
+public class ApplicationJsonSerializationException extends ContentSerializationException {
 
-    public ApplicationJsonSerializationException(Throwable e) {
-        super(MESSAGE, e);
+    public ApplicationJsonSerializationException(byte[] content,  ContentType contentType) {
+        super(null, content, contentType);
     }
 
+    public ApplicationJsonSerializationException(Throwable cause, byte[] content, ContentType contentType) {
+        super(null, cause, content, contentType);
+    }
 }

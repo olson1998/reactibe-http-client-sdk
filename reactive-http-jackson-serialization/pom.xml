@@ -19,7 +19,11 @@
     <dependencies>
         <dependency>
             <groupId>com.github.olson1998.http</groupId>
-            <artifactId>reactive-http-model</artifactId>
+            <artifactId>reactive-http-serialization</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.github.olson1998.http</groupId>
+            <artifactId>reactive-http-exception</artifactId>
         </dependency>
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>

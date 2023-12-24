@@ -14,6 +14,8 @@
         <module>reactive-http-model</module>
         <module>reactive-netty-http-client</module>
         <module>reactive-http-jackson-serialization</module>
+        <module>reactive-http-exception</module>
+        <module>reactive-http-serialization</module>
     </modules>
 
     <properties>
@@ -54,8 +56,33 @@
             </dependency>
             <dependency>
                 <groupId>com.github.olson1998.http</groupId>
+                <artifactId>reactive-http-serialization</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.olson1998.http</groupId>
+                <artifactId>reactive-http-exception</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.olson1998.http</groupId>
                 <artifactId>reactive-http-client</artifactId>
                 <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.olson1998.http</groupId>
+                <artifactId>reactive-netty-http-client</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.olson1998.http</groupId>
+                <artifactId>reactive-http-jackson-serialization</artifactId>
+                <version>${revision}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpcore</artifactId>
+                <version>4.4.16</version>
             </dependency>
             <dependency>
                 <groupId>org.assertj</groupId>

@@ -20,5 +20,9 @@
             <groupId>com.github.olson1998.http</groupId>
             <artifactId>reactive-http-model</artifactId>
         </dependency>
+        <dependency>
+            <groupId>com.github.olson1998.http</groupId>
+            <artifactId>reactive-http-serialization</artifactId>
+        </dependency>
     </dependencies>
 </project>

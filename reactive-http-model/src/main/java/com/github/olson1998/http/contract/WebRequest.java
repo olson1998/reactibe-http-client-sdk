@@ -1,11 +1,12 @@
 package com.github.olson1998.http.contract;
 
-import com.github.olson1998.http.serialization.ContentSerializer;
+import org.apache.http.entity.ContentType;
 
 import java.net.URI;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 public interface WebRequest {
 
@@ -14,6 +15,10 @@ public interface WebRequest {
     String httpMethod();
 
     Map<String, List<String>> httpHeaders();
+
+    Object body();
+
+    Optional<ContentType> findContentType();
 
     Duration timeoutDuration();
 
@@ -30,6 +35,10 @@ public interface WebRequest {
         Builder addHttpHeader(String httpHeader, String httpHeaderValue);
 
         Builder addHttpHeaders(String httpHeader, Iterable<String> headerValues);
+
+        Builder contentType(ContentType contentType);
+
+        Builder body(Object body);
 
         Builder timeoutDuration(Duration duration);
 

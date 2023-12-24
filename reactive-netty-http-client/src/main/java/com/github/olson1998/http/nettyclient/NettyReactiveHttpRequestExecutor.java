@@ -1,6 +1,7 @@
 package com.github.olson1998.http.nettyclient;
 
 import com.github.olson1998.http.client.ReactiveHttpRequestExecutor;
+import com.github.olson1998.http.client.util.HttpUtil;
 import com.github.olson1998.http.contract.ClientHttpResponse;
 import com.github.olson1998.http.contract.WebRequest;
 import com.github.olson1998.http.contract.WebResponse;
@@ -10,7 +11,6 @@ import com.github.olson1998.http.nettyclient.util.NettyUtil;
 import com.github.olson1998.http.serialization.ContentDeserializer;
 import com.github.olson1998.http.serialization.ResponseMapping;
 import com.github.olson1998.http.serialization.SerializationCodecs;
-import io.netty.handler.codec.http.HttpHeaders;
 import io.netty.handler.codec.http.HttpMethod;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -24,7 +24,7 @@ import reactor.netty.http.client.HttpClientForm;
 import reactor.netty.http.client.HttpClientRequest;
 import reactor.netty.http.client.HttpClientResponse;
 
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Consumer;
 
 import static org.apache.http.HttpHeaders.CONTENT_TYPE;
@@ -36,14 +36,47 @@ public class NettyReactiveHttpRequestExecutor implements ReactiveHttpRequestExec
 
     private final SerializationCodecs serializationCodecs;
 
+    private final Map<String, List<String>> defaultHttpHeaders = new HashMap<>();
+
     public NettyReactiveHttpRequestExecutor(HttpClient httpClient) {
         this.httpClient = httpClient;
         this.serializationCodecs = new SerializationCodecs();
     }
 
     @Override
+    public Mono<WebResponse<byte[]>> sendHttpRequest(WebRequest webRequest) {
+        return executeHttpRequest(webRequest);
+    }
+
+    @Override
+    public <T> Mono<WebResponse<T>> sendHttpRequest(WebRequest webRequest, Class<T> responseMapping) {
+        return executeHttpRequest(webRequest, new ResponseMapping<>() {
+        });
+    }
+
+    @Override
     public <T> Mono<WebResponse<T>> sendHttpRequest(WebRequest webRequest, ResponseMapping<T> responseMapping) {
         return executeHttpRequest(webRequest, responseMapping);
+    }
+
+    @Override
+    public void addHttpHeader(String httpHeader, String httpHeaderValue) {
+        HttpUtil.appendHttpHeader(defaultHttpHeaders, httpHeader, httpHeaderValue);
+    }
+
+    @Override
+    public void addHttpHeaders(@NonNull String httpHeader,@NonNull Iterable<String> httpHeaderValues) {
+        HttpUtil.appendHttpHeaders(defaultHttpHeaders, httpHeader, httpHeaderValues);
+    }
+
+    @Override
+    public void removeHttpHeader(String httpHeader) {
+        defaultHttpHeaders.remove(httpHeader);
+    }
+
+    @Override
+    public void removeHttpHeader(String httpHeader, Collection<String> httpHeaderValues) {
+        HttpUtil.removeHttpHeaders(defaultHttpHeaders, httpHeader, httpHeaderValues);
     }
 
     @Override
@@ -55,6 +88,28 @@ public class NettyReactiveHttpRequestExecutor implements ReactiveHttpRequestExec
         return webRequest.findContentType()
                 .map(contentType -> executeHttpRequestWithContent(webRequest, contentType, responseMapping))
                 .orElseGet(()-> executeHttpRequestWithNoContent(webRequest, responseMapping));
+    }
+
+    private Mono<WebResponse<byte[]>> executeHttpRequest(WebRequest webRequest){
+        return webRequest.findContentType()
+                .map(contentType -> executeHttpRequestWithContent(webRequest, contentType))
+                .orElseGet(()-> executeHttpRequestWithNoContent(webRequest));
+    }
+
+    private Mono<WebResponse<byte[]>> executeHttpRequestWithNoContent(WebRequest webRequest){
+        var httpMethod = new HttpMethod(webRequest.httpMethod());
+        return httpClient.request(httpMethod)
+                .uri(webRequest.uri())
+                .sendForm(((httpClientRequest, httpClientForm) -> doSend(httpClientRequest, httpClientForm, webRequest)))
+                .responseSingle((this::doReceive));
+    }
+
+    private Mono<WebResponse<byte[]>> executeHttpRequestWithContent(WebRequest webRequest, ContentType contentType){
+        var httpMethod = new HttpMethod(webRequest.httpMethod());
+        return httpClient.request(httpMethod)
+                .uri(webRequest.uri())
+                .send(((httpClientRequest, nettyOutbound) -> doSend(httpClientRequest, nettyOutbound, webRequest, contentType)))
+                .responseSingle((this::doReceive));
     }
 
     private <V> Mono<WebResponse<V>> executeHttpRequestWithNoContent(WebRequest webRequest, ResponseMapping<V> responseMapping){
@@ -82,6 +137,7 @@ public class NettyReactiveHttpRequestExecutor implements ReactiveHttpRequestExec
     private Publisher<Void> doSend(@NonNull HttpClientRequest httpClientRequest, NettyOutbound nettyOutbound, @NonNull WebRequest webRequest, ContentType contentType){
         Optional.ofNullable(webRequest.timeoutDuration()).ifPresent(httpClientRequest::responseTimeout);
         var contentSerializer = serializationCodecs.getContentSerializer(contentType);
+        defaultHttpHeaders.forEach((httpHeader, httpHeaderValues) -> httpHeaderValues.forEach(httpHeaderValue -> httpClientRequest.addHeader(httpHeader, httpHeaderValue)));
         webRequest.httpHeaders()
                 .forEach((httpHeader, httpHeaderValues) -> httpHeaderValues.forEach(httpHeaderValue -> httpClientRequest.addHeader(httpHeader, httpHeaderValue)));
         return nettyOutbound.send(NettyUtil.createContentPublisher(contentSerializer, contentType, webRequest.body()));

@@ -15,10 +15,14 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 
-import static com.github.olson1998.http.client.util.HttpEntityUtil.transformToReadOnly;
+import static com.github.olson1998.http.client.util.HttpUtil.transformToReadOnly;
 
 @UtilityClass
 public class NettyUtil {
+
+    public static void appendHttpHeaders(HttpHeaders httpHeaders, Map<String, List<String>> httpHeadersMap){
+        httpHeadersMap.forEach((httpHeader, httpHeaderValues) -> httpHeaderValues.forEach(httpHeaderValue -> httpHeaders.add(httpHeader, httpHeaderValue)));
+    }
 
     public static Map<String, List<String>> transformHttpHeaders(HttpHeaders httpHeaders){
         var readWriteHttpHeaders = new HashMap<String, List<String>>();

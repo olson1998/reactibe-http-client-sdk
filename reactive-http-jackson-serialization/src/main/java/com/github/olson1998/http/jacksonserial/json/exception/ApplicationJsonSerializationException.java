@@ -1,6 +1,6 @@
 package com.github.olson1998.http.jacksonserial.json.exception;
 
-import com.github.olson1998.http.exception.ContentSerializationException;
+import com.github.olson1998.http.serialization.exception.ContentSerializationException;
 import org.apache.http.entity.ContentType;
 
 public class ApplicationJsonSerializationException extends ContentSerializationException {

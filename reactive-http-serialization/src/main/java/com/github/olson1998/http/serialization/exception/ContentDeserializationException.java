@@ -1,4 +1,4 @@
-package com.github.olson1998.http.exception;
+package com.github.olson1998.http.serialization.exception;
 
 import lombok.Getter;
 import org.apache.http.entity.ContentType;

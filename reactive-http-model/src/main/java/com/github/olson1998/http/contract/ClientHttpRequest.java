@@ -1,5 +1,8 @@
 package com.github.olson1998.http.contract;
 
+import com.github.olson1998.http.Headers;
+import com.github.olson1998.http.HttpHeader;
+import com.github.olson1998.http.HttpHeaders;
 import com.github.olson1998.http.HttpMethod;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -11,7 +14,7 @@ import java.util.*;
 
 import static org.apache.http.HttpHeaders.CONTENT_TYPE;
 
-public record ClientHttpRequest(URI uri, HttpMethod httpMethod, Map<String, List<String>> httpHeaders, Object body, Duration timeoutDuration) implements WebRequest {
+public record ClientHttpRequest(URI uri, HttpMethod httpMethod, HttpHeaders httpHeaders, Object body, Duration timeoutDuration) implements WebRequest {
 
     @Override
     public Optional<ContentType> findContentType() {
@@ -37,7 +40,7 @@ public record ClientHttpRequest(URI uri, HttpMethod httpMethod, Map<String, List
 
         private Duration timeoutDuration;
 
-        private final Map<String, List<String>> httpHeaders = new HashMap<>();
+        private final HttpHeaders httpHeaders = new Headers();
 
         private Object body;
 
@@ -54,15 +57,14 @@ public record ClientHttpRequest(URI uri, HttpMethod httpMethod, Map<String, List
         }
 
         @Override
+        public WebRequest.Builder addHttpHeader(HttpHeader httpHeader) {
+            httpHeaders.appendHttpHeader(httpHeader);
+            return this;
+        }
+
+        @Override
         public WebRequest.Builder addHttpHeader(String httpHeader, String httpHeaderValue) {
-            if(this.httpHeaders.containsKey(httpHeader)){
-                var httpHeaderValues = this.httpHeaders.get(httpHeader);
-                httpHeaderValues.add(httpHeader);
-            }else {
-                var httpHeaderValues = new ArrayList<String>();
-                httpHeaderValues.add(httpHeaderValue);
-                this.httpHeaders.put(httpHeader, httpHeaderValues);
-            }
+            httpHeaders.appendHttpHeader(httpHeader, httpHeaderValue);
             return this;
         }
 
@@ -76,6 +78,12 @@ public record ClientHttpRequest(URI uri, HttpMethod httpMethod, Map<String, List
                 headerValues.forEach(httpHeaderValues::add);
                 this.httpHeaders.put(httpHeader, httpHeaderValues);
             }
+            return this;
+        }
+
+        @Override
+        public WebRequest.Builder addHttpHeaders(HttpHeaders httpHeaders) {
+            this.httpHeaders.putAll(httpHeaders);
             return this;
         }
 

@@ -1,8 +1,7 @@
 package com.github.olson1998.http.contract;
 
-import java.util.List;
-import java.util.Map;
+import com.github.olson1998.http.HttpHeaders;
 
-public record ClientHttpResponse<C>(int statusCode, Map<String, List<String>> httpHeaders, C body) implements WebResponse<C> {
+public record ClientHttpResponse<C>(int statusCode, HttpHeaders httpHeaders, C body) implements WebResponse<C> {
 
 }

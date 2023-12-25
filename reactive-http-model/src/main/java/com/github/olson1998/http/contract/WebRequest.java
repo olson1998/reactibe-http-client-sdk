@@ -1,5 +1,7 @@
 package com.github.olson1998.http.contract;
 
+import com.github.olson1998.http.HttpHeader;
+import com.github.olson1998.http.HttpHeaders;
 import com.github.olson1998.http.HttpMethod;
 import org.apache.http.entity.ContentType;
 
@@ -15,7 +17,7 @@ public interface WebRequest {
 
     HttpMethod httpMethod();
 
-    Map<String, List<String>> httpHeaders();
+    HttpHeaders httpHeaders();
 
     Object body();
 
@@ -33,9 +35,13 @@ public interface WebRequest {
 
         Builder httpMethod(HttpMethod httpMethod);
 
+        Builder addHttpHeader(HttpHeader httpHeader);
+
         Builder addHttpHeader(String httpHeader, String httpHeaderValue);
 
         Builder addHttpHeaders(String httpHeader, Iterable<String> headerValues);
+
+        Builder addHttpHeaders(HttpHeaders httpHeaders);
 
         Builder contentType(ContentType contentType);
 

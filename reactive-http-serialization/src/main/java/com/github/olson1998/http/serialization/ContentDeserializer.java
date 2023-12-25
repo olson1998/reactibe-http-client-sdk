@@ -1,5 +1,6 @@
 package com.github.olson1998.http.serialization;
 
+import com.github.olson1998.http.serialization.context.DeserializationContext;
 import org.apache.http.entity.ContentType;
 
 import java.util.Set;
@@ -11,8 +12,8 @@ public interface ContentDeserializer {
 
     Set<ContentType> getSupportedContentTypes();
 
-    <C> BiFunction<byte[], ContentType, C> deserialize(Class<C> deserializedPojoClass);
+    <C> BiFunction<byte[], DeserializationContext, C> deserialize(Class<C> deserializedPojoClass);
 
-    <C> BiFunction<byte[], ContentType, C> deserializeMapped(ResponseMapping<C> responseMapping);
+    <C> BiFunction<byte[], DeserializationContext, C> deserializeMapped(ResponseMapping<C> responseMapping);
 
 }

@@ -14,8 +14,8 @@
         <module>reactive-http-model</module>
         <module>reactive-netty-http-client</module>
         <module>reactive-http-jackson-serialization</module>
-        <module>reactive-http-exception</module>
         <module>reactive-http-serialization</module>
+        <module>reactive-http-jsoup-html-serialization</module>
     </modules>
 
     <properties>
@@ -57,11 +57,6 @@
             <dependency>
                 <groupId>com.github.olson1998.http</groupId>
                 <artifactId>reactive-http-serialization</artifactId>
-                <version>${revision}</version>
-            </dependency>
-            <dependency>
-                <groupId>com.github.olson1998.http</groupId>
-                <artifactId>reactive-http-exception</artifactId>
                 <version>${revision}</version>
             </dependency>
             <dependency>

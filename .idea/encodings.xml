@@ -7,6 +7,8 @@
     <file url="file://$PROJECT_DIR$/reactive-http-exception/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/reactive-http-jackson-serialization/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/reactive-http-jackson-serialization/src/main/resources" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/reactive-http-jsoup-html-serialization/src/main/java" charset="UTF-8" />
+    <file url="file://$PROJECT_DIR$/reactive-http-jsoup-html-serialization/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/reactive-http-model/src/main/java" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/reactive-http-model/src/main/resources" charset="UTF-8" />
     <file url="file://$PROJECT_DIR$/reactive-http-serialization/src/main/java" charset="UTF-8" />

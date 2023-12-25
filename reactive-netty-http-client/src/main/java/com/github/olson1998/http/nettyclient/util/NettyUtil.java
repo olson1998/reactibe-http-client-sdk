@@ -1,5 +1,7 @@
 package com.github.olson1998.http.nettyclient.util;
 
+import com.github.olson1998.http.ReadOnlyHttpHeader;
+import com.github.olson1998.http.ReadOnlyHttpHeaders;
 import com.github.olson1998.http.serialization.ContentSerializer;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -10,12 +12,9 @@ import org.reactivestreams.Publisher;
 import reactor.netty.ByteBufMono;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
-
-import static com.github.olson1998.http.client.util.HttpUtil.transformToReadOnly;
 
 @UtilityClass
 public class NettyUtil {
@@ -24,20 +23,12 @@ public class NettyUtil {
         httpHeadersMap.forEach((httpHeader, httpHeaderValues) -> httpHeaderValues.forEach(httpHeaderValue -> httpHeaders.add(httpHeader, httpHeaderValue)));
     }
 
-    public static Map<String, List<String>> transformHttpHeaders(HttpHeaders httpHeaders){
-        var readWriteHttpHeaders = new HashMap<String, List<String>>();
+    public static com.github.olson1998.http.HttpHeaders transformHttpHeaders(HttpHeaders httpHeaders){
+        var httpHeadersList = new ArrayList<ReadOnlyHttpHeader>();
         httpHeaders.forEach(httpHeaderEntry ->{
-            var httpHeader = httpHeaderEntry.getKey();
-            var value = httpHeaderEntry.getValue();
-            if(readWriteHttpHeaders.containsKey(httpHeader)){
-                readWriteHttpHeaders.get(httpHeader).add(value);
-            }else {
-                var headerValues = new ArrayList<String>();
-                headerValues.add(value);
-                readWriteHttpHeaders.put(httpHeader, headerValues);
-            }
+           httpHeadersList.add(new ReadOnlyHttpHeader(httpHeaderEntry.getKey(), httpHeaderEntry.getValue()));
         });
-        return transformToReadOnly(readWriteHttpHeaders);
+        return new ReadOnlyHttpHeaders(httpHeadersList);
     }
 
     public static <C> Publisher<ByteBuf> createContentPublisher(ContentSerializer contentSerializer, ContentType contentType, C content){

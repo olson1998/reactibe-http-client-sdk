@@ -22,10 +22,6 @@
             <artifactId>reactive-http-client</artifactId>
         </dependency>
         <dependency>
-            <groupId>com.github.olson1998.http</groupId>
-            <artifactId>reactive-http-exception</artifactId>
-        </dependency>
-        <dependency>
             <groupId>io.projectreactor.netty</groupId>
             <artifactId>reactor-netty-http</artifactId>
             <version>${reactor-netty-http.version}</version>

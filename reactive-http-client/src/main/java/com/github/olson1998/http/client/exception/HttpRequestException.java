@@ -1,4 +1,4 @@
-package com.github.olson1998.http.exception;
+package com.github.olson1998.http.client.exception;
 
 public class HttpRequestException extends RuntimeException {
 

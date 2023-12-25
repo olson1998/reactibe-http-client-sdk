@@ -1,13 +1,12 @@
 package com.github.olson1998.http.contract;
 
-import java.util.List;
-import java.util.Map;
+import com.github.olson1998.http.HttpHeaders;
 
 public interface WebResponse<C> {
 
     int statusCode();
 
-    Map<String, List<String>> httpHeaders();
+    HttpHeaders httpHeaders();
 
     C body();
 }

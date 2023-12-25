@@ -1,5 +1,6 @@
 package com.github.olson1998.http.contract;
 
+import com.github.olson1998.http.HttpMethod;
 import org.apache.http.entity.ContentType;
 
 import java.net.URI;
@@ -12,7 +13,7 @@ public interface WebRequest {
 
     URI uri();
 
-    String httpMethod();
+    HttpMethod httpMethod();
 
     Map<String, List<String>> httpHeaders();
 
@@ -30,7 +31,7 @@ public interface WebRequest {
 
         Builder uri(URI uri);
 
-        Builder httpMethod(String httpMethod);
+        Builder httpMethod(HttpMethod httpMethod);
 
         Builder addHttpHeader(String httpHeader, String httpHeaderValue);
 

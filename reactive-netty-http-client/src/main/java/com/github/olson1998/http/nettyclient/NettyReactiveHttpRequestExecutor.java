@@ -20,13 +20,13 @@ import reactor.core.publisher.Mono;
 import reactor.netty.ByteBufMono;
 import reactor.netty.NettyOutbound;
 import reactor.netty.http.client.HttpClient;
-import reactor.netty.http.client.HttpClientForm;
 import reactor.netty.http.client.HttpClientRequest;
 import reactor.netty.http.client.HttpClientResponse;
 
 import java.util.*;
 import java.util.function.Consumer;
 
+import static java.util.Map.entry;
 import static org.apache.http.HttpHeaders.CONTENT_TYPE;
 
 @RequiredArgsConstructor
@@ -45,18 +45,29 @@ public class NettyReactiveHttpRequestExecutor implements ReactiveHttpRequestExec
 
     @Override
     public Mono<WebResponse<byte[]>> sendHttpRequest(WebRequest webRequest) {
-        return executeHttpRequest(webRequest);
+        var httpMethod = new HttpMethod(webRequest.httpMethod().name());
+        return httpClient.request(httpMethod)
+                .uri(webRequest.uri())
+                .send(((httpClientRequest, nettyOutbound) -> doSend(httpClientRequest, nettyOutbound, webRequest)))
+                .responseSingle((this::doReceive));
     }
 
     @Override
     public <T> Mono<WebResponse<T>> sendHttpRequest(WebRequest webRequest, Class<T> responseMapping) {
-        return executeHttpRequest(webRequest, new ResponseMapping<>() {
-        });
+        var httpMethod = new HttpMethod(webRequest.httpMethod().name());
+        return httpClient.request(httpMethod)
+                .uri(webRequest.uri())
+                .send(((httpClientRequest, nettyOutbound) -> doSend(httpClientRequest, nettyOutbound, webRequest)))
+                .responseSingle(((httpClientResponse, byteBufMono) -> doReceive(httpClientResponse, byteBufMono, responseMapping)));
     }
 
     @Override
     public <T> Mono<WebResponse<T>> sendHttpRequest(WebRequest webRequest, ResponseMapping<T> responseMapping) {
-        return executeHttpRequest(webRequest, responseMapping);
+        var httpMethod = new HttpMethod(webRequest.httpMethod().name());
+        return httpClient.request(httpMethod)
+                .uri(webRequest.uri())
+                .send(((httpClientRequest, nettyOutbound) -> doSend(httpClientRequest, nettyOutbound, webRequest)))
+                .responseSingle(((httpClientResponse, byteBufMono) -> doReceive(httpClientResponse, byteBufMono, responseMapping)));
     }
 
     @Override
@@ -84,67 +95,24 @@ public class NettyReactiveHttpRequestExecutor implements ReactiveHttpRequestExec
         serializationCodecsConsumer.accept(serializationCodecs);
     }
 
-    private <V> Mono<WebResponse<V>> executeHttpRequest(WebRequest webRequest, ResponseMapping<V> responseMapping){
-        return webRequest.findContentType()
-                .map(contentType -> executeHttpRequestWithContent(webRequest, contentType, responseMapping))
-                .orElseGet(()-> executeHttpRequestWithNoContent(webRequest, responseMapping));
-    }
-
-    private Mono<WebResponse<byte[]>> executeHttpRequest(WebRequest webRequest){
-        return webRequest.findContentType()
-                .map(contentType -> executeHttpRequestWithContent(webRequest, contentType))
-                .orElseGet(()-> executeHttpRequestWithNoContent(webRequest));
-    }
-
-    private Mono<WebResponse<byte[]>> executeHttpRequestWithNoContent(WebRequest webRequest){
-        var httpMethod = new HttpMethod(webRequest.httpMethod());
-        return httpClient.request(httpMethod)
-                .uri(webRequest.uri())
-                .sendForm(((httpClientRequest, httpClientForm) -> doSend(httpClientRequest, httpClientForm, webRequest)))
-                .responseSingle((this::doReceive));
-    }
-
-    private Mono<WebResponse<byte[]>> executeHttpRequestWithContent(WebRequest webRequest, ContentType contentType){
-        var httpMethod = new HttpMethod(webRequest.httpMethod());
-        return httpClient.request(httpMethod)
-                .uri(webRequest.uri())
-                .send(((httpClientRequest, nettyOutbound) -> doSend(httpClientRequest, nettyOutbound, webRequest, contentType)))
-                .responseSingle((this::doReceive));
-    }
-
-    private <V> Mono<WebResponse<V>> executeHttpRequestWithNoContent(WebRequest webRequest, ResponseMapping<V> responseMapping){
-        var httpMethod = new HttpMethod(webRequest.httpMethod());
-        return httpClient.request(httpMethod)
-                .uri(webRequest.uri())
-                .sendForm(((httpClientRequest, httpClientForm) -> doSend(httpClientRequest, httpClientForm, webRequest)))
-                .responseSingle(((httpClientResponse, byteBufMono) -> doReceive(httpClientResponse, byteBufMono, responseMapping)));
-    }
-
-    private <V> Mono<WebResponse<V>> executeHttpRequestWithContent(WebRequest webRequest, ContentType contentType, ResponseMapping<V> responseMapping){
-        var httpMethod = new HttpMethod(webRequest.httpMethod());
-        return httpClient.request(httpMethod)
-                .uri(webRequest.uri())
-                .send(((httpClientRequest, nettyOutbound) -> doSend(httpClientRequest, nettyOutbound, webRequest, contentType)))
-                .responseSingle(((httpClientResponse, byteBufMono) -> doReceive(httpClientResponse, byteBufMono, responseMapping)));
-    }
-
-    private void doSend(@NonNull HttpClientRequest httpClientRequest, @NonNull HttpClientForm httpClientForm, @NonNull WebRequest webRequest){
+    private Publisher<Void> doSend(@NonNull HttpClientRequest httpClientRequest, NettyOutbound nettyOutbound, @NonNull WebRequest webRequest){
         Optional.ofNullable(webRequest.timeoutDuration()).ifPresent(httpClientRequest::responseTimeout);
+        defaultHttpHeaders
+                .forEach((httpHeader, httpHeaderValues) -> httpHeaderValues.forEach(httpHeaderValue -> httpClientRequest.addHeader(httpHeader, httpHeaderValue)));
         webRequest.httpHeaders()
                 .forEach((httpHeader, httpHeaderValues) -> httpHeaderValues.forEach(httpHeaderValue -> httpClientRequest.addHeader(httpHeader, httpHeaderValue)));
+        return webRequest.findContentType()
+                .map(contentType -> doSend(contentType, nettyOutbound, webRequest))
+                .orElseGet(()-> doSend(nettyOutbound));
     }
 
-    private Publisher<Void> doSend(@NonNull HttpClientRequest httpClientRequest, NettyOutbound nettyOutbound, @NonNull WebRequest webRequest, ContentType contentType){
-        Optional.ofNullable(webRequest.timeoutDuration()).ifPresent(httpClientRequest::responseTimeout);
+    private Publisher<Void> doSend(@NonNull ContentType contentType,@NonNull  NettyOutbound nettyOutbound,@NonNull  WebRequest webRequest){
         var contentSerializer = serializationCodecs.getContentSerializer(contentType);
-        defaultHttpHeaders.forEach((httpHeader, httpHeaderValues) -> httpHeaderValues.forEach(httpHeaderValue -> httpClientRequest.addHeader(httpHeader, httpHeaderValue)));
-        webRequest.httpHeaders()
-                .forEach((httpHeader, httpHeaderValues) -> httpHeaderValues.forEach(httpHeaderValue -> httpClientRequest.addHeader(httpHeader, httpHeaderValue)));
         return nettyOutbound.send(NettyUtil.createContentPublisher(contentSerializer, contentType, webRequest.body()));
     }
 
-    private Mono<WebResponse<Void>> doReceive(HttpClientResponse httpClientResponse){
-        return Mono.just(doCreateWebResponse(httpClientResponse, null));
+    private Publisher<Void> doSend(@NonNull NettyOutbound nettyOutbound){
+        return nettyOutbound.send(Mono.empty());
     }
 
     private Mono<WebResponse<byte[]>> doReceive(HttpClientResponse httpClientResponse, ByteBufMono byteBufMono){
@@ -153,11 +121,16 @@ public class NettyReactiveHttpRequestExecutor implements ReactiveHttpRequestExec
     }
 
     private <T> Mono<WebResponse<T>> doReceive(HttpClientResponse httpClientResponse, ByteBufMono byteBufMono, ResponseMapping<T> responseMapping){
-        var contentTypeValue = httpClientResponse.responseHeaders().get(CONTENT_TYPE);
-        var contentType = ContentType.parse(contentTypeValue);
-        var contentDeserializer = serializationCodecs.getContentDeserializer(contentType);
+        var deserializer = getContentDeserializer(httpClientResponse);
         return byteBufMono.asByteArray()
-                .map(bodyBytes -> doDeserializeResponseBody(httpClientResponse, bodyBytes, contentType, contentDeserializer, responseMapping))
+                .map(bodyBytes -> doDeserializeResponseBody(httpClientResponse, bodyBytes, deserializer.getKey(), deserializer.getValue(), responseMapping))
+                .map(responseBody -> doCreateWebResponse(httpClientResponse, responseBody));
+    }
+
+    private <T> Mono<WebResponse<T>> doReceive(HttpClientResponse httpClientResponse, ByteBufMono byteBufMono, Class<T> responseMapping){
+        var deserializer = getContentDeserializer(httpClientResponse);
+        return byteBufMono.asByteArray()
+                .map(bodyBytes -> doDeserializeResponseBody(httpClientResponse, bodyBytes, deserializer.getKey(), deserializer.getValue(), responseMapping))
                 .map(responseBody -> doCreateWebResponse(httpClientResponse, responseBody));
     }
 
@@ -180,6 +153,21 @@ public class NettyReactiveHttpRequestExecutor implements ReactiveHttpRequestExec
         }
     }
 
+    private <T> T doDeserializeResponseBody(HttpClientResponse httpClientResponse, byte[] bodyBytes, ContentType contentType, ContentDeserializer contentDeserializer, Class<T> responseMapping){
+        var contentDeserialization = contentDeserializer.deserialize(responseMapping);
+        try{
+            return contentDeserialization.apply(bodyBytes, contentType);
+        }catch (ContentDeserializationException e){
+            var statusCode = httpClientResponse.status().code();
+            var httpHeaders = NettyUtil.transformHttpHeaders(httpClientResponse.responseHeaders());
+            throw new HttpResponseException("Failed to deserialize http response",e, statusCode, httpHeaders);
+        }
+    }
 
+    private Map.Entry<ContentType, ContentDeserializer> getContentDeserializer(HttpClientResponse httpClientResponse){
+        var contentTypeValue = httpClientResponse.responseHeaders().get(CONTENT_TYPE);
+        var contentType = ContentType.parse(contentTypeValue);
+        return entry(contentType, serializationCodecs.getContentDeserializer(contentType));
+    }
 
 }

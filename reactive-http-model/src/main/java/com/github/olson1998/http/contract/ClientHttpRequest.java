@@ -1,5 +1,6 @@
 package com.github.olson1998.http.contract;
 
+import com.github.olson1998.http.HttpMethod;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 import org.apache.http.entity.ContentType;
@@ -10,7 +11,7 @@ import java.util.*;
 
 import static org.apache.http.HttpHeaders.CONTENT_TYPE;
 
-public record ClientHttpRequest(URI uri, String httpMethod, Map<String, List<String>> httpHeaders, Object body, Duration timeoutDuration) implements WebRequest {
+public record ClientHttpRequest(URI uri, HttpMethod httpMethod, Map<String, List<String>> httpHeaders, Object body, Duration timeoutDuration) implements WebRequest {
 
     @Override
     public Optional<ContentType> findContentType() {
@@ -32,7 +33,7 @@ public record ClientHttpRequest(URI uri, String httpMethod, Map<String, List<Str
 
         private URI uri;
 
-        private String httpMethod;
+        private HttpMethod httpMethod;
 
         private Duration timeoutDuration;
 
@@ -47,7 +48,7 @@ public record ClientHttpRequest(URI uri, String httpMethod, Map<String, List<Str
         }
 
         @Override
-        public WebRequest.Builder httpMethod(String httpMethod) {
+        public WebRequest.Builder httpMethod(HttpMethod httpMethod) {
             this.httpMethod = httpMethod;
             return this;
         }

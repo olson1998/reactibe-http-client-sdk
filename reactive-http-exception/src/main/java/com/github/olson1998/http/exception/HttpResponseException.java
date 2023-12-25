@@ -8,7 +8,7 @@ import java.util.Map;
 @Getter
 public class HttpResponseException extends RuntimeException {
 
-    private static final String MESSAGE = "Http response failed, received status code: %s, reason: %s";
+    private static final String MESSAGE = "Http Request failed, received status code: %s, reason: %s";
 
     private final int statusCode;
 

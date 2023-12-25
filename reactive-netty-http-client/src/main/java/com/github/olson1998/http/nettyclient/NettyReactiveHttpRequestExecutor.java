@@ -149,7 +149,7 @@ public class NettyReactiveHttpRequestExecutor implements ReactiveHttpRequestExec
         }catch (ContentDeserializationException e){
             var statusCode = httpClientResponse.status().code();
             var httpHeaders = NettyUtil.transformHttpHeaders(httpClientResponse.responseHeaders());
-            throw new HttpResponseException("Failed to deserialize http response",e, statusCode, httpHeaders);
+            throw new HttpResponseException("Failed to deserialize http response body content of type: %s using: %s".formatted(contentType, contentDeserializer),e, statusCode, httpHeaders);
         }
     }
 
@@ -160,7 +160,7 @@ public class NettyReactiveHttpRequestExecutor implements ReactiveHttpRequestExec
         }catch (ContentDeserializationException e){
             var statusCode = httpClientResponse.status().code();
             var httpHeaders = NettyUtil.transformHttpHeaders(httpClientResponse.responseHeaders());
-            throw new HttpResponseException("Failed to deserialize http response",e, statusCode, httpHeaders);
+            throw new HttpResponseException("Failed to deserialize http response body content of type: %s using: %s".formatted(contentType, contentDeserializer),e, statusCode, httpHeaders);
         }
     }
 

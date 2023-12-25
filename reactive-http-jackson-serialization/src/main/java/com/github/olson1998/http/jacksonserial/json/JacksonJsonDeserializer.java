@@ -39,7 +39,7 @@ public class JacksonJsonDeserializer extends AbstractJacksonJsonSerialization im
         try{
             return objectMapper.readValue(jsonBytes, mappedClass);
         }catch (IOException e){
-            throw new ApplicationJsonDeserializationException(jsonBytes, getPrimaryContentType());
+            throw new ApplicationJsonDeserializationException(e, jsonBytes, getPrimaryContentType());
         }
     }
 
@@ -48,7 +48,7 @@ public class JacksonJsonDeserializer extends AbstractJacksonJsonSerialization im
             var typeRef = createJacksonTypeRef(responseMapping);
             return objectMapper.readValue(jsonBytes, typeRef);
         }catch (IOException e){
-            throw new ApplicationJsonDeserializationException(jsonBytes, getPrimaryContentType());
+            throw new ApplicationJsonDeserializationException(e, jsonBytes, getPrimaryContentType());
         }
     }
 

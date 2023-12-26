@@ -8,6 +8,7 @@ import org.apache.http.entity.ContentType;
 import java.util.Set;
 
 public class JsoupHtmlSerializationCodec implements SerializationCodec {
+
     @Override
     public Set<ContentType> getSupportedContentTypes() {
         return Set.of(ContentType.TEXT_HTML);
@@ -20,6 +21,6 @@ public class JsoupHtmlSerializationCodec implements SerializationCodec {
 
     @Override
     public ContentDeserializer getContentDeserializer() {
-        return null;
+        return new JsoupHtmlDeserializer();
     }
 }

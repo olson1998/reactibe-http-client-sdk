@@ -19,9 +19,15 @@ public class ReadOnlyHttpHeader implements HttpHeader {
     }
 
     @Override
+    public HttpHeader readOnly() {
+        return this;
+    }
+
+    @Override
     public String toString() {
         var httpHeader = new StringBuilder(key);
         Optional.ofNullable(value).ifPresent(headerValue -> httpHeader.append(": ").append(value));
         return httpHeader.toString();
     }
+
 }

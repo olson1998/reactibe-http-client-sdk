@@ -19,4 +19,19 @@ public interface HttpHeaders extends Map<String, List<String>>{
     void appendHttpHeader(HttpHeader httpHeader);
 
     void appendHttpHeader(String httpHeader, String httpHeaderValue);
+
+    HttpHeaders readOnly();
+
+    static interface Builder{
+
+        Builder nextHeader(HttpHeader httpHeader);
+
+        Builder nextHeader(String httpHeader, String httpHeaderValues);
+
+        Builder nextHeaders(HttpHeaders httpHeaders);
+
+        Builder nextHeadersMap(Map<String, List<String>> httpHeaders);
+
+        Builder contentType(ContentType contentType);
+    }
 }

@@ -10,7 +10,7 @@ import com.github.olson1998.http.client.exception.HttpResponseException;
 import com.github.olson1998.http.nettyclient.util.NettyUtil;
 import com.github.olson1998.http.serialization.ResponseMapping;
 import com.github.olson1998.http.serialization.SerializationCodecs;
-import com.github.olson1998.http.serialization.context.ResponseBodyDeserializationContext;
+import com.github.olson1998.http.serialization.context.ContentSerializationContext;
 import io.netty.handler.codec.http.HttpMethod;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -135,7 +135,7 @@ public class NettyReactiveHttpRequestExecutor implements ReactiveHttpRequestExec
         var contentType = httpHeaders.findContentType().orElseThrow();
         var deserializer = serializationCodecs.getContentDeserializer(contentType);
         var statusCode = httpClientResponse.status().code();
-        var context = new ResponseBodyDeserializationContext(statusCode, contentType, httpHeaders);
+        var context = new ContentSerializationContext(statusCode, contentType, httpHeaders);
         try{
             var deserializedPojo = deserializer.deserialize(responseMapping).apply(bodyBytes, context);
             return new ClientHttpResponse<>(statusCode, httpHeaders, deserializedPojo);
@@ -150,7 +150,7 @@ public class NettyReactiveHttpRequestExecutor implements ReactiveHttpRequestExec
         var contentType = httpHeaders.findContentType().orElseThrow();
         var deserializer = serializationCodecs.getContentDeserializer(contentType);
         var statusCode = httpClientResponse.status().code();
-        var context = new ResponseBodyDeserializationContext(statusCode, contentType, httpHeaders);
+        var context = new ContentSerializationContext(statusCode, contentType, httpHeaders);
         try{
             var deserializedPojo = deserializer.deserializeMapped(responseMapping).apply(bodyBytes, context);
             return new ClientHttpResponse<>(statusCode, httpHeaders, deserializedPojo);

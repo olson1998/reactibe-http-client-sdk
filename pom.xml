@@ -16,6 +16,7 @@
         <module>reactive-http-jackson-serialization</module>
         <module>reactive-http-serialization</module>
         <module>reactive-http-jsoup-html-serialization</module>
+        <module>reactive-http-image-ij-serialization</module>
     </modules>
 
     <properties>

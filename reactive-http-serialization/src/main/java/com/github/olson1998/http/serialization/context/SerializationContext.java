@@ -6,9 +6,7 @@ import org.apache.http.entity.ContentType;
 import java.nio.charset.Charset;
 import java.util.Optional;
 
-public interface DeserializationContext {
-
-    int getStatusCode();
+public interface SerializationContext {
 
     ContentType getContentType();
 

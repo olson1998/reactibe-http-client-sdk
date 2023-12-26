@@ -14,9 +14,7 @@ import java.util.Optional;
 @ToString
 @EqualsAndHashCode
 @RequiredArgsConstructor
-public class ResponseBodyDeserializationContext implements DeserializationContext {
-
-    private final int statusCode;
+public class ContentSerializationContext implements SerializationContext {
 
     private final ContentType contentType;
 

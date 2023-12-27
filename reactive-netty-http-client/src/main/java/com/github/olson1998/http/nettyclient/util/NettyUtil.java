@@ -3,6 +3,7 @@ package com.github.olson1998.http.nettyclient.util;
 import com.github.olson1998.http.ReadOnlyHttpHeader;
 import com.github.olson1998.http.ReadOnlyHttpHeaders;
 import com.github.olson1998.http.serialization.ContentSerializer;
+import com.github.olson1998.http.serialization.context.SerializationContext;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.handler.codec.http.HttpHeaders;
@@ -31,8 +32,8 @@ public class NettyUtil {
         return new ReadOnlyHttpHeaders(httpHeadersList);
     }
 
-    public static <C> Publisher<ByteBuf> createContentPublisher(ContentSerializer contentSerializer, ContentType contentType, C content){
-        var serializationFuture = CompletableFuture.supplyAsync(()-> contentSerializer.serialize().apply(content, contentType))
+    public static <C> Publisher<ByteBuf> createContentPublisher(ContentSerializer contentSerializer, SerializationContext serializationContext, C content){
+        var serializationFuture = CompletableFuture.supplyAsync(()-> contentSerializer.serialize().apply(content, serializationContext))
                 .thenApplyAsync(Unpooled::copiedBuffer);
         return ByteBufMono.fromFuture(serializationFuture);
     }

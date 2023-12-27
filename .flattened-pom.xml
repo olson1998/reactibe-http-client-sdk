@@ -13,6 +13,7 @@
     <module>reactive-http-jackson-serialization</module>
     <module>reactive-http-serialization</module>
     <module>reactive-http-jsoup-html-serialization</module>
+    <module>reactive-http-image-serialization</module>
   </modules>
   <properties>
     <maven.compiler.source>19</maven.compiler.source>

@@ -9,7 +9,9 @@
     </option>
     <option name="ignoredFiles">
       <set>
+        <option value="$PROJECT_DIR$/reactive-http-client-image-serialization/pom.xml" />
         <option value="$PROJECT_DIR$/reactive-http-exception/pom.xml" />
+        <option value="$PROJECT_DIR$/reactive-http-image-ij-serialization/pom.xml" />
       </set>
     </option>
   </component>

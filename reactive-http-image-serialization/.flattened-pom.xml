@@ -8,22 +8,16 @@
     <version>0.0.1-SNAPSHOT</version>
   </parent>
   <groupId>com.github.olson1998.http</groupId>
-  <artifactId>reactive-http-model</artifactId>
+  <artifactId>reactive-http-image-serialization</artifactId>
   <version>0.0.1-SNAPSHOT</version>
   <properties>
     <maven.compiler.target>19</maven.compiler.target>
     <maven.compiler.source>19</maven.compiler.source>
-    <commons-lang3.version>3.14.0</commons-lang3.version>
   </properties>
   <dependencies>
     <dependency>
-      <groupId>org.apache.httpcomponents</groupId>
-      <artifactId>httpcore</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.commons</groupId>
-      <artifactId>commons-lang3</artifactId>
-      <version>${commons-lang3.version}</version>
+      <groupId>com.github.olson1998.http</groupId>
+      <artifactId>reactive-http-serialization</artifactId>
     </dependency>
   </dependencies>
 </project>

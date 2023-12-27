@@ -105,7 +105,8 @@ public class NettyReactiveHttpRequestExecutor implements ReactiveHttpRequestExec
 
     private Publisher<Void> doSend(@NonNull ContentType contentType,@NonNull  NettyOutbound nettyOutbound,@NonNull  WebRequest webRequest){
         var contentSerializer = serializationCodecs.getContentSerializer(contentType);
-        return nettyOutbound.send(NettyUtil.createContentPublisher(contentSerializer, contentType, webRequest.body()));
+        var context = new ContentSerializationContext(contentType, webRequest.httpHeaders());
+        return nettyOutbound.send(NettyUtil.createContentPublisher(contentSerializer, context, webRequest.body()));
     }
 
     private Publisher<Void> doSend(@NonNull NettyOutbound nettyOutbound){
@@ -135,7 +136,7 @@ public class NettyReactiveHttpRequestExecutor implements ReactiveHttpRequestExec
         var contentType = httpHeaders.findContentType().orElseThrow();
         var deserializer = serializationCodecs.getContentDeserializer(contentType);
         var statusCode = httpClientResponse.status().code();
-        var context = new ContentSerializationContext(statusCode, contentType, httpHeaders);
+        var context = new ContentSerializationContext(contentType, httpHeaders);
         try{
             var deserializedPojo = deserializer.deserialize(responseMapping).apply(bodyBytes, context);
             return new ClientHttpResponse<>(statusCode, httpHeaders, deserializedPojo);
@@ -150,7 +151,7 @@ public class NettyReactiveHttpRequestExecutor implements ReactiveHttpRequestExec
         var contentType = httpHeaders.findContentType().orElseThrow();
         var deserializer = serializationCodecs.getContentDeserializer(contentType);
         var statusCode = httpClientResponse.status().code();
-        var context = new ContentSerializationContext(statusCode, contentType, httpHeaders);
+        var context = new ContentSerializationContext(contentType, httpHeaders);
         try{
             var deserializedPojo = deserializer.deserializeMapped(responseMapping).apply(bodyBytes, context);
             return new ClientHttpResponse<>(statusCode, httpHeaders, deserializedPojo);

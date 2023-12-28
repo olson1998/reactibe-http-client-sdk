@@ -2,6 +2,7 @@ package com.github.olson1998.http.serialization;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 import lombok.ToString;
 
 import java.lang.reflect.ParameterizedType;
@@ -10,6 +11,7 @@ import java.lang.reflect.Type;
 @Getter
 @ToString
 @EqualsAndHashCode
+@RequiredArgsConstructor
 public abstract class ResponseMapping<T> {
 
     private final Type pojoType;

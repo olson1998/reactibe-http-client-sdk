@@ -4,9 +4,9 @@ import com.github.olson1998.http.HttpHeaders;
 
 public interface WebResponse<C> {
 
-    int statusCode();
+    int getStatusCode();
 
-    HttpHeaders httpHeaders();
+    HttpHeaders getHttpHeaders();
 
-    C body();
+    C getBody();
 }

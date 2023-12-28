@@ -42,27 +42,27 @@ public class NettyReactiveRestClient implements ReactiveRestClient {
 
     @Override
     public Mono<WebResponse<byte[]>> sendHttpRequest(WebRequest webRequest) {
-        var httpMethod = new HttpMethod(webRequest.httpMethod().name());
+        var httpMethod = new HttpMethod(webRequest.getHttpMethod().name());
         return httpClient.request(httpMethod)
-                .uri(webRequest.uri())
+                .uri(webRequest.getUri())
                 .send(((httpClientRequest, nettyOutbound) -> doSend(httpClientRequest, nettyOutbound, webRequest)))
                 .responseSingle((this::doReceive));
     }
 
     @Override
     public <T> Mono<WebResponse<T>> sendHttpRequest(WebRequest webRequest, Class<T> responseMapping) {
-        var httpMethod = new HttpMethod(webRequest.httpMethod().name());
+        var httpMethod = new HttpMethod(webRequest.getHttpMethod().name());
         return httpClient.request(httpMethod)
-                .uri(webRequest.uri())
+                .uri(webRequest.getUri())
                 .send(((httpClientRequest, nettyOutbound) -> doSend(httpClientRequest, nettyOutbound, webRequest)))
                 .responseSingle(((httpClientResponse, byteBufMono) -> doReceive(httpClientResponse, byteBufMono, responseMapping)));
     }
 
     @Override
     public <T> Mono<WebResponse<T>> sendHttpRequest(WebRequest webRequest, ResponseMapping<T> responseMapping) {
-        var httpMethod = new HttpMethod(webRequest.httpMethod().name());
+        var httpMethod = new HttpMethod(webRequest.getHttpMethod().name());
         return httpClient.request(httpMethod)
-                .uri(webRequest.uri())
+                .uri(webRequest.getUri())
                 .send(((httpClientRequest, nettyOutbound) -> doSend(httpClientRequest, nettyOutbound, webRequest)))
                 .responseSingle(((httpClientResponse, byteBufMono) -> doReceive(httpClientResponse, byteBufMono, responseMapping)));
     }
@@ -93,10 +93,9 @@ public class NettyReactiveRestClient implements ReactiveRestClient {
     }
 
     private Publisher<Void> doSend(@NonNull HttpClientRequest httpClientRequest, NettyOutbound nettyOutbound, @NonNull WebRequest webRequest){
-        Optional.ofNullable(webRequest.timeoutDuration()).ifPresent(httpClientRequest::responseTimeout);
         defaultHttpHeaders
                 .forEach((httpHeader, httpHeaderValues) -> httpHeaderValues.forEach(httpHeaderValue -> httpClientRequest.addHeader(httpHeader, httpHeaderValue)));
-        webRequest.httpHeaders()
+        webRequest.getHttpHeaders()
                 .forEach((httpHeader, httpHeaderValues) -> httpHeaderValues.forEach(httpHeaderValue -> httpClientRequest.addHeader(httpHeader, httpHeaderValue)));
         return webRequest.findContentType()
                 .map(contentType -> doSend(contentType, nettyOutbound, webRequest))
@@ -105,8 +104,8 @@ public class NettyReactiveRestClient implements ReactiveRestClient {
 
     private Publisher<Void> doSend(@NonNull ContentType contentType,@NonNull  NettyOutbound nettyOutbound,@NonNull  WebRequest webRequest){
         var contentSerializer = serializationCodecs.getContentSerializer(contentType);
-        var context = new ContentSerializationContext(contentType, webRequest.httpHeaders());
-        return nettyOutbound.send(NettyUtil.createContentPublisher(contentSerializer, context, webRequest.body()));
+        var context = new ContentSerializationContext(contentType, webRequest.getHttpHeaders());
+        return nettyOutbound.send(NettyUtil.createContentPublisher(contentSerializer, context, webRequest.getBody()));
     }
 
     private Publisher<Void> doSend(@NonNull NettyOutbound nettyOutbound){

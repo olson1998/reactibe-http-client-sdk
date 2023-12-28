@@ -13,17 +13,17 @@ import java.util.Optional;
 
 public interface WebRequest {
 
-    URI uri();
+    URI getUri();
 
-    HttpMethod httpMethod();
+    HttpMethod getHttpMethod();
 
-    HttpHeaders httpHeaders();
+    HttpHeaders getHttpHeaders();
 
-    Object body();
+    Object getBody();
 
     Optional<ContentType> findContentType();
 
-    Duration timeoutDuration();
+    Map<String, Object> getAttributes();
 
     static Builder builder(){
         return new ClientHttpRequest.Builder();
@@ -47,7 +47,11 @@ public interface WebRequest {
 
         Builder body(Object body);
 
-        Builder timeoutDuration(Duration duration);
+        Builder addAttribute(String attribute, Object values);
+
+        Builder addAttributes(Map<String, Object> attributes);
+
+        Builder removeAttribute(String attribute);
 
         WebRequest build();
     }

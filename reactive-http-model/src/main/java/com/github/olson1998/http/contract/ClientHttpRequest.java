@@ -4,17 +4,27 @@ import com.github.olson1998.http.Headers;
 import com.github.olson1998.http.HttpHeader;
 import com.github.olson1998.http.HttpHeaders;
 import com.github.olson1998.http.HttpMethod;
-import lombok.AccessLevel;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.apache.http.entity.ContentType;
 
 import java.net.URI;
-import java.time.Duration;
 import java.util.*;
 
 import static org.apache.http.HttpHeaders.CONTENT_TYPE;
 
-public record ClientHttpRequest(URI uri, HttpMethod httpMethod, HttpHeaders httpHeaders, Object body, Duration timeoutDuration) implements WebRequest {
+@Getter
+@AllArgsConstructor
+public class ClientHttpRequest implements WebRequest {
+
+    private final HttpMethod httpMethod;
+
+    private final URI uri;
+
+    private final HttpHeaders httpHeaders;
+
+    private final Object body;
+
+    private final Map<String, Object> attributes;
 
     @Override
     public Optional<ContentType> findContentType() {
@@ -25,6 +35,20 @@ public record ClientHttpRequest(URI uri, HttpMethod httpMethod, HttpHeaders http
         }else {
             return Optional.empty();
         }
+    }
+
+    @Override
+    public String toString() {
+        var webRequest = new StringBuilder();
+        webRequest.append("\n").append(httpMethod);
+        webRequest.append("\n").append(uri);
+        var httpHeadersList = httpHeaders.getHttpHeaderList();
+        for(var httpHeader : httpHeadersList){
+            webRequest.append("\n").append(httpHeader.getKey());
+            Optional.ofNullable(httpHeader.getValue()).ifPresent(value -> webRequest.append(": ").append(value));
+        }
+        Optional.ofNullable(body).ifPresent(bodyObject -> webRequest.append("\n").append(bodyObject));
+        return webRequest.toString();
     }
 
     public static Builder builder(){
@@ -38,11 +62,11 @@ public record ClientHttpRequest(URI uri, HttpMethod httpMethod, HttpHeaders http
 
         private HttpMethod httpMethod;
 
-        private Duration timeoutDuration;
-
         private final HttpHeaders httpHeaders = new Headers();
 
         private Object body;
+
+        private final Map<String, Object> attributes = new HashMap<>();
 
         @Override
         public WebRequest.Builder uri(URI uri) {
@@ -100,17 +124,28 @@ public record ClientHttpRequest(URI uri, HttpMethod httpMethod, HttpHeaders http
         }
 
         @Override
-        public WebRequest.Builder timeoutDuration(Duration duration) {
-            this.timeoutDuration = duration;
+        public WebRequest.Builder addAttribute(String attribute, Object values) {
+            attributes.putIfAbsent(attribute, values);
             return this;
         }
 
+        @Override
+        public WebRequest.Builder addAttributes(Map<String, Object> attributes) {
+            attributes.forEach(this.attributes::putIfAbsent);
+            return this;
+        }
+
+        @Override
+        public WebRequest.Builder removeAttribute(String attribute) {
+            attributes.remove(attribute);
+            return this;
+        }
 
         @Override
         public WebRequest build() {
             Objects.requireNonNull(uri, "Http request URI has not been specified");
             Objects.requireNonNull(httpMethod, "Http method has not been specified");
-            return new ClientHttpRequest(uri, httpMethod, httpHeaders, body, timeoutDuration);
+            return new ClientHttpRequest(httpMethod, uri, httpHeaders, body, attributes);
         }
 
     }

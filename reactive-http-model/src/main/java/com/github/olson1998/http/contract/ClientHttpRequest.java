@@ -89,7 +89,7 @@ public record ClientHttpRequest(URI uri, HttpMethod httpMethod, HttpHeaders http
 
         @Override
         public WebRequest.Builder contentType(ContentType contentType) {
-            addHttpHeader(CONTENT_TYPE, contentType.toString());
+            addHttpHeader(CONTENT_TYPE, contentType.getMimeType());
             return this;
         }
 

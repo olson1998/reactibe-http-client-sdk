@@ -1,6 +1,6 @@
 package com.github.olson1998.http.nettyclient;
 
-import com.github.olson1998.http.client.ReactiveHttpRequestExecutor;
+import com.github.olson1998.http.client.ReactiveRestClient;
 import com.github.olson1998.http.client.util.HttpUtil;
 import com.github.olson1998.http.contract.ClientHttpResponse;
 import com.github.olson1998.http.contract.WebRequest;
@@ -27,7 +27,7 @@ import java.util.*;
 import java.util.function.Consumer;
 
 @RequiredArgsConstructor
-public class NettyReactiveHttpRequestExecutor implements ReactiveHttpRequestExecutor {
+public class NettyReactiveRestClient implements ReactiveRestClient {
 
     private final HttpClient httpClient;
 
@@ -35,7 +35,7 @@ public class NettyReactiveHttpRequestExecutor implements ReactiveHttpRequestExec
 
     private final Map<String, List<String>> defaultHttpHeaders = new HashMap<>();
 
-    public NettyReactiveHttpRequestExecutor(HttpClient httpClient) {
+    public NettyReactiveRestClient(HttpClient httpClient) {
         this.httpClient = httpClient;
         this.serializationCodecs = new SerializationCodecs();
     }

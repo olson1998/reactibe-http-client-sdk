@@ -9,7 +9,7 @@ import reactor.core.publisher.Mono;
 import java.util.Collection;
 import java.util.function.Consumer;
 
-public interface ReactiveHttpRequestExecutor {
+public interface ReactiveRestClient {
 
     Mono<WebResponse<byte[]>> sendHttpRequest(WebRequest webRequest);
 

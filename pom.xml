@@ -26,12 +26,13 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <lombok.version>1.18.30</lombok.version>
         <reactor-core.version>3.6.1</reactor-core.version>
+        <assertj-core.version>3.24.2</assertj-core.version>
         <org.assertj.assertj-core.version>3.24.2</org.assertj.assertj-core.version>
-        <org.junit.jupiter.junit-jupiter-api.version>5.10.0</org.junit.jupiter.junit-jupiter-api.version>
-        <org.junit.jupiter.junit-jupiter-params.version>5.10.0</org.junit.jupiter.junit-jupiter-params.version>
-        <org.junit.jupiter.junit-platform-launcher.version>1.10.0</org.junit.jupiter.junit-platform-launcher.version>
-        <org.mockito.mockito-core.version>5.4.0</org.mockito.mockito-core.version>
-        <org.mockito.mockito-juniut-jupiter.version>5.2.0</org.mockito.mockito-juniut-jupiter.version>
+        <junit-jupiter-api.version>5.10.0</junit-jupiter-api.version>
+        <junit-jupiter-params.version>5.10.0</junit-jupiter-params.version>
+        <junit-platform-launcher.version>1.10.0</junit-platform-launcher.version>
+        <mockito-core.version>5.4.0</mockito-core.version>
+        <mockito-juniut-jupiter.version>5.2.0</mockito-juniut-jupiter.version>
     </properties>
 
     <dependencies>
@@ -45,6 +46,42 @@
             <groupId>io.projectreactor</groupId>
             <artifactId>reactor-core</artifactId>
             <version>${reactor-core.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>${assertj-core.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-api</artifactId>
+            <version>${junit-jupiter-api.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.platform</groupId>
+            <artifactId>junit-platform-launcher</artifactId>
+            <version>${junit-platform-launcher.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-params</artifactId>
+            <version>${junit-jupiter-params.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>${mockito-core.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-junit-jupiter</artifactId>
+            <version>${mockito-juniut-jupiter.version}</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
 
@@ -79,30 +116,6 @@
                 <groupId>org.apache.httpcomponents</groupId>
                 <artifactId>httpcore</artifactId>
                 <version>4.4.16</version>
-            </dependency>
-            <dependency>
-                <groupId>org.assertj</groupId>
-                <artifactId>assertj-core</artifactId>
-                <version>${org.assertj.assertj-core.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.junit.jupiter</groupId>
-                <artifactId>junit-jupiter-api</artifactId>
-                <version>${org.junit.jupiter.junit-jupiter-api.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.junit.platform</groupId>
-                <artifactId>junit-platform-launcher</artifactId>
-                <version>${org.junit.jupiter.junit-platform-launcher.version}</version>
-                <scope>test</scope>
-            </dependency>
-            <dependency>
-                <groupId>org.junit.jupiter</groupId>
-                <artifactId>junit-jupiter-params</artifactId>
-                <version>${org.junit.jupiter.junit-jupiter-params.version}</version>
-                <scope>test</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>

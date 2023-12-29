@@ -1,16 +1,16 @@
 package com.github.olson1998.http.nettyclient;
 
 import com.github.olson1998.http.client.ReactiveRestClient;
+import com.github.olson1998.http.client.exception.HttpResponseException;
 import com.github.olson1998.http.client.util.HttpUtil;
 import com.github.olson1998.http.contract.ClientHttpResponse;
 import com.github.olson1998.http.contract.WebRequest;
 import com.github.olson1998.http.contract.WebResponse;
-import com.github.olson1998.http.serialization.exception.ContentDeserializationException;
-import com.github.olson1998.http.client.exception.HttpResponseException;
 import com.github.olson1998.http.nettyclient.util.NettyUtil;
 import com.github.olson1998.http.serialization.ResponseMapping;
 import com.github.olson1998.http.serialization.SerializationCodecs;
 import com.github.olson1998.http.serialization.context.ContentSerializationContext;
+import com.github.olson1998.http.serialization.exception.ContentDeserializationException;
 import io.netty.handler.codec.http.HttpMethod;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -23,7 +23,10 @@ import reactor.netty.http.client.HttpClient;
 import reactor.netty.http.client.HttpClientRequest;
 import reactor.netty.http.client.HttpClientResponse;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 
 @RequiredArgsConstructor
@@ -73,7 +76,7 @@ public class NettyReactiveRestClient implements ReactiveRestClient {
     }
 
     @Override
-    public void addHttpHeaders(@NonNull String httpHeader,@NonNull Iterable<String> httpHeaderValues) {
+    public void addHttpHeaders(@NonNull String httpHeader, @NonNull Iterable<String> httpHeaderValues) {
         HttpUtil.appendHttpHeaders(defaultHttpHeaders, httpHeader, httpHeaderValues);
     }
 
@@ -92,71 +95,71 @@ public class NettyReactiveRestClient implements ReactiveRestClient {
         serializationCodecsConsumer.accept(serializationCodecs);
     }
 
-    private Publisher<Void> doSend(@NonNull HttpClientRequest httpClientRequest, NettyOutbound nettyOutbound, @NonNull WebRequest webRequest){
+    private Publisher<Void> doSend(@NonNull HttpClientRequest httpClientRequest, NettyOutbound nettyOutbound, @NonNull WebRequest webRequest) {
         defaultHttpHeaders
                 .forEach((httpHeader, httpHeaderValues) -> httpHeaderValues.forEach(httpHeaderValue -> httpClientRequest.addHeader(httpHeader, httpHeaderValue)));
         webRequest.getHttpHeaders()
                 .forEach((httpHeader, httpHeaderValues) -> httpHeaderValues.forEach(httpHeaderValue -> httpClientRequest.addHeader(httpHeader, httpHeaderValue)));
         return webRequest.findContentType()
                 .map(contentType -> doSend(contentType, nettyOutbound, webRequest))
-                .orElseGet(()-> doSend(nettyOutbound));
+                .orElseGet(() -> doSend(nettyOutbound));
     }
 
-    private Publisher<Void> doSend(@NonNull ContentType contentType,@NonNull  NettyOutbound nettyOutbound,@NonNull  WebRequest webRequest){
+    private Publisher<Void> doSend(@NonNull ContentType contentType, @NonNull NettyOutbound nettyOutbound, @NonNull WebRequest webRequest) {
         var contentSerializer = serializationCodecs.getContentSerializer(contentType);
         var context = new ContentSerializationContext(contentType, webRequest.getHttpHeaders());
         return nettyOutbound.send(NettyUtil.createContentPublisher(contentSerializer, context, webRequest.getBody()));
     }
 
-    private Publisher<Void> doSend(@NonNull NettyOutbound nettyOutbound){
+    private Publisher<Void> doSend(@NonNull NettyOutbound nettyOutbound) {
         return nettyOutbound.send(Mono.empty());
     }
 
-    private Mono<WebResponse<byte[]>> doReceive(HttpClientResponse httpClientResponse, ByteBufMono byteBufMono){
+    private Mono<WebResponse<byte[]>> doReceive(HttpClientResponse httpClientResponse, ByteBufMono byteBufMono) {
         return byteBufMono.asByteArray().map(responseBody -> doCreateWebResponse(httpClientResponse, responseBody));
     }
 
-    private <T> Mono<WebResponse<T>> doReceive(HttpClientResponse httpClientResponse, ByteBufMono byteBufMono, ResponseMapping<T> responseMapping){
+    private <T> Mono<WebResponse<T>> doReceive(HttpClientResponse httpClientResponse, ByteBufMono byteBufMono, ResponseMapping<T> responseMapping) {
         return byteBufMono.asByteArray().map(bodyBytes -> doCreateWebResponse(httpClientResponse, bodyBytes, responseMapping));
     }
 
-    private <T> Mono<WebResponse<T>> doReceive(HttpClientResponse httpClientResponse, ByteBufMono byteBufMono, Class<T> responseMapping){
+    private <T> Mono<WebResponse<T>> doReceive(HttpClientResponse httpClientResponse, ByteBufMono byteBufMono, Class<T> responseMapping) {
         return byteBufMono.asByteArray().map(bodyBytes -> doCreateWebResponse(httpClientResponse, bodyBytes, responseMapping));
     }
 
-    private WebResponse<byte[]> doCreateWebResponse(HttpClientResponse httpClientResponse, byte[] bodyBytes){
+    private WebResponse<byte[]> doCreateWebResponse(HttpClientResponse httpClientResponse, byte[] bodyBytes) {
         var statusCode = httpClientResponse.status().code();
         var httpHeaders = NettyUtil.transformHttpHeaders(httpClientResponse.responseHeaders());
         return new ClientHttpResponse<>(statusCode, httpHeaders, bodyBytes);
     }
 
-    private <T> WebResponse<T> doCreateWebResponse(HttpClientResponse httpClientResponse, byte[] bodyBytes, Class<T> responseMapping){
+    private <T> WebResponse<T> doCreateWebResponse(HttpClientResponse httpClientResponse, byte[] bodyBytes, Class<T> responseMapping) {
         var httpHeaders = NettyUtil.transformHttpHeaders(httpClientResponse.responseHeaders());
         var contentType = httpHeaders.findContentType().orElseThrow();
         var deserializer = serializationCodecs.getContentDeserializer(contentType);
         var statusCode = httpClientResponse.status().code();
         var context = new ContentSerializationContext(contentType, httpHeaders);
-        try{
+        try {
             var deserializedPojo = deserializer.deserialize(responseMapping).apply(bodyBytes, context);
             return new ClientHttpResponse<>(statusCode, httpHeaders, deserializedPojo);
-        }catch (ContentDeserializationException e){
+        } catch (ContentDeserializationException e) {
             var msg = "Failed to deserialize http response body content of type: %s".formatted(contentType);
-            throw new HttpResponseException(msg,e, statusCode, httpHeaders);
+            throw new HttpResponseException(msg, e, statusCode, httpHeaders);
         }
     }
 
-    private <T> WebResponse<T> doCreateWebResponse(HttpClientResponse httpClientResponse, byte[] bodyBytes, ResponseMapping<T> responseMapping){
+    private <T> WebResponse<T> doCreateWebResponse(HttpClientResponse httpClientResponse, byte[] bodyBytes, ResponseMapping<T> responseMapping) {
         var httpHeaders = NettyUtil.transformHttpHeaders(httpClientResponse.responseHeaders());
         var contentType = httpHeaders.findContentType().orElseThrow();
         var deserializer = serializationCodecs.getContentDeserializer(contentType);
         var statusCode = httpClientResponse.status().code();
         var context = new ContentSerializationContext(contentType, httpHeaders);
-        try{
+        try {
             var deserializedPojo = deserializer.deserializeMapped(responseMapping).apply(bodyBytes, context);
             return new ClientHttpResponse<>(statusCode, httpHeaders, deserializedPojo);
-        }catch (ContentDeserializationException e){
+        } catch (ContentDeserializationException e) {
             var msg = "Failed to deserialize http response body content of type: %s".formatted(contentType);
-            throw new HttpResponseException(msg,e, statusCode, httpHeaders);
+            throw new HttpResponseException(msg, e, statusCode, httpHeaders);
         }
     }
 

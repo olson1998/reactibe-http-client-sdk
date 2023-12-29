@@ -30,72 +30,72 @@ public class JacksonJsonDeserializer extends AbstractJacksonJsonSerialization im
         return (bodyBytes, context) -> doDeserializeJson(bodyBytes, responseMapping, context);
     }
 
-    private <C> C doDeserializeJson(byte[] jsonBytes, Class<C> mappedClass, SerializationContext serializationContext){
+    private <C> C doDeserializeJson(byte[] jsonBytes, Class<C> mappedClass, SerializationContext serializationContext) {
         var optionalCharset = serializationContext.findContentCharset();
-        if(optionalCharset.isEmpty()){
+        if (optionalCharset.isEmpty()) {
             return doDeserialize(jsonBytes, mappedClass, serializationContext);
-        }else {
+        } else {
             var charset = optionalCharset.get();
-            if(charset.equals(UTF_8)){
+            if (charset.equals(UTF_8)) {
                 return doDeserialize(jsonBytes, mappedClass, serializationContext);
-            }else {
+            } else {
                 return doDeserialize(jsonBytes, charset, mappedClass, serializationContext);
             }
         }
     }
 
-    private <C> C doDeserializeJson(byte[] jsonBytes, ResponseMapping<C> responseMapping, SerializationContext serializationContext){
+    private <C> C doDeserializeJson(byte[] jsonBytes, ResponseMapping<C> responseMapping, SerializationContext serializationContext) {
         var optionalCharset = serializationContext.findContentCharset();
-        if(optionalCharset.isEmpty()){
+        if (optionalCharset.isEmpty()) {
             return doDeserialize(jsonBytes, responseMapping, serializationContext);
-        }else {
+        } else {
             var charset = optionalCharset.get();
-            if(charset.equals(UTF_8)){
+            if (charset.equals(UTF_8)) {
                 return doDeserialize(jsonBytes, responseMapping, serializationContext);
-            }else {
+            } else {
                 return doDeserialize(jsonBytes, charset, responseMapping, serializationContext);
             }
         }
     }
 
-    private <C> C doDeserialize(byte[] jsonBytes, Class<C> mappedClass, SerializationContext serializationContext){
-        try{
+    private <C> C doDeserialize(byte[] jsonBytes, Class<C> mappedClass, SerializationContext serializationContext) {
+        try {
             return objectMapper.readValue(jsonBytes, mappedClass);
-        }catch (IOException e){
+        } catch (IOException e) {
             throw new ApplicationJsonDeserializationException(e, jsonBytes, serializationContext.getContentType());
         }
     }
 
-    private <C> C doDeserialize(byte[] jsonBytes, ResponseMapping<C> responseMapping, SerializationContext serializationContext){
-        try{
+    private <C> C doDeserialize(byte[] jsonBytes, ResponseMapping<C> responseMapping, SerializationContext serializationContext) {
+        try {
             var typeRef = createJacksonTypeRef(responseMapping);
             return objectMapper.readValue(jsonBytes, typeRef);
-        }catch (IOException e){
+        } catch (IOException e) {
             throw new ApplicationJsonDeserializationException(e, jsonBytes, serializationContext.getContentType());
         }
     }
 
-    private <C> C doDeserialize(byte[] jsonBytes, Charset charset, Class<C> mappedClass, SerializationContext serializationContext){
-        try{
+    private <C> C doDeserialize(byte[] jsonBytes, Charset charset, Class<C> mappedClass, SerializationContext serializationContext) {
+        try {
             var json = new String(jsonBytes, charset);
             return objectMapper.readValue(json, mappedClass);
-        }catch (IOException e){
+        } catch (IOException e) {
             throw new ApplicationJsonDeserializationException(e, jsonBytes, serializationContext.getContentType());
         }
     }
 
-    private <C> C doDeserialize(byte[] jsonBytes, Charset charset, ResponseMapping<C> responseMapping, SerializationContext serializationContext){
-        try{
+    private <C> C doDeserialize(byte[] jsonBytes, Charset charset, ResponseMapping<C> responseMapping, SerializationContext serializationContext) {
+        try {
             var json = new String(jsonBytes, charset);
             var typeRef = createJacksonTypeRef(responseMapping);
             return objectMapper.readValue(json, typeRef);
-        }catch (IOException e){
+        } catch (IOException e) {
             throw new ApplicationJsonDeserializationException(e, jsonBytes, serializationContext.getContentType());
         }
     }
 
 
-    private<C>  TypeReference<C> createJacksonTypeRef(ResponseMapping<C> responseMapping){
+    private <C> TypeReference<C> createJacksonTypeRef(ResponseMapping<C> responseMapping) {
         return new TypeReference<C>() {
             @Override
             public Type getType() {

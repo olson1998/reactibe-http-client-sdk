@@ -22,22 +22,22 @@ public enum ImageExtension {
 
     private final String extension;
 
-    public static Optional<ImageExtension> findByFistChar(char character){
+    public static Optional<ImageExtension> findByFistChar(char character) {
         return Arrays.stream(ImageExtension.values())
                 .filter(imageExtension -> imageExtension.firstChar == character)
                 .findFirst();
     }
 
-    public static Optional<ImageExtension> findByExtension(String extension){
+    public static Optional<ImageExtension> findByExtension(String extension) {
         return Arrays.stream(ImageExtension.values())
                 .filter(imageExtension -> imageExtension.extension.equals(extension))
                 .findFirst();
     }
 
-    public static Optional<ImageExtension> findImageExtension(String image){
-        if(image == null || image.length() < 1){
+    public static Optional<ImageExtension> findImageExtension(String image) {
+        if (image == null || image.length() < 1) {
             return Optional.empty();
-        }else {
+        } else {
             return findByFistChar(image.charAt(0));
         }
     }

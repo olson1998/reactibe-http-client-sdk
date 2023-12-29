@@ -21,12 +21,12 @@ public class ImageContentSerializer extends AbstractImageSerialization implement
         return null;
     }
 
-    private byte[] doSerializeImage(Object imageObject, SerializationContext serializationContext){
-        if(imageObject instanceof byte[] bytes){
+    private byte[] doSerializeImage(Object imageObject, SerializationContext serializationContext) {
+        if (imageObject instanceof byte[] bytes) {
             return bytes;
         } else if (imageObject instanceof RenderedImage image) {
             return doSerialize(image, serializationContext);
-        }else {
+        } else {
             throw new ImageSerializationException(
                     "Cannot serialize: '%s' into image bytes".formatted(imageObject),
                     imageObject,
@@ -35,11 +35,11 @@ public class ImageContentSerializer extends AbstractImageSerialization implement
         }
     }
 
-    private byte[] doSerialize(RenderedImage image, SerializationContext serializationContext){
+    private byte[] doSerialize(RenderedImage image, SerializationContext serializationContext) {
         ImageWriter imageWriter = null;
         ImageOutputStream imageOutput = null;
         var contentType = serializationContext.getContentType();
-        try(var outputStream = new ByteArrayOutputStream()){
+        try (var outputStream = new ByteArrayOutputStream()) {
             imageWriter = selectImageWriter(contentType);
             imageOutput = ImageIO.createImageOutputStream(outputStream);
             imageWriter.setOutput(imageOutput);
@@ -47,12 +47,12 @@ public class ImageContentSerializer extends AbstractImageSerialization implement
             imageWriter.dispose();
             imageOutput.flush();
             return outputStream.toByteArray();
-        }catch (IOException e){
+        } catch (IOException e) {
             Optional.ofNullable(imageWriter).ifPresent(ImageWriter::dispose);
             Optional.ofNullable(imageOutput).ifPresent(imageOutputStream -> {
-                try{
+                try {
                     imageOutputStream.flush();
-                }catch (IOException ioException){
+                } catch (IOException ioException) {
                     e.addSuppressed(ioException);
                 }
             });
@@ -60,11 +60,11 @@ public class ImageContentSerializer extends AbstractImageSerialization implement
         }
     }
 
-    private ImageWriter selectImageWriter(ContentType contentType) throws IOException{
+    private ImageWriter selectImageWriter(ContentType contentType) throws IOException {
         var imageWriters = ImageIO.getImageWritersByMIMEType(contentType.getMimeType());
-        if(imageWriters.hasNext()){
+        if (imageWriters.hasNext()) {
             return imageWriters.next();
-        }else {
+        } else {
             throw new IOException("No Image writer registered for content type: %s".formatted(contentType));
         }
     }

@@ -18,45 +18,45 @@ public class SerializationCodecs implements Iterable<SerializationCodec> {
         return serializationCodecs.listIterator();
     }
 
-    public ContentSerializer getContentSerializer(@NonNull ContentType contentType){
+    public ContentSerializer getContentSerializer(@NonNull ContentType contentType) {
         return serializationCodecs.stream()
                 .filter(serializationCodec -> isSupportingSerialization(serializationCodec, contentType))
                 .map(SerializationCodec::getContentSerializer)
                 .findFirst()
-                .orElseThrow(()-> new NoCodecRegisteredException(contentType));
+                .orElseThrow(() -> new NoCodecRegisteredException(contentType));
     }
 
-    public ContentDeserializer getContentDeserializer(@NonNull ContentType contentType){
+    public ContentDeserializer getContentDeserializer(@NonNull ContentType contentType) {
         return serializationCodecs.stream()
                 .filter(serializationCodec -> isSupportingSerialization(serializationCodec, contentType))
                 .map(SerializationCodec::getContentDeserializer)
                 .findFirst()
-                .orElseThrow(()-> new NoCodecRegisteredException(contentType));
+                .orElseThrow(() -> new NoCodecRegisteredException(contentType));
     }
 
-    public void registerCodec(SerializationCodec serializationCodec){
+    public void registerCodec(SerializationCodec serializationCodec) {
         serializationCodecs.add(serializationCodec);
     }
 
-    public void unregisterCodec(SerializationCodec serializationCodec){
+    public void unregisterCodec(SerializationCodec serializationCodec) {
         serializationCodecs.remove(serializationCodec);
     }
 
-    private boolean isSupportingSerialization(SerializationCodec serializationCodec, ContentType contentType){
+    private boolean isSupportingSerialization(SerializationCodec serializationCodec, ContentType contentType) {
         return serializationCodec.getSupportedContentTypes().stream()
                 .anyMatch(supportedContentType -> isSameMimeType(supportedContentType, contentType));
     }
 
-    private boolean isSameMimeType(ContentType thatType, ContentType thisType){
+    private boolean isSameMimeType(ContentType thatType, ContentType thisType) {
         var thatMimeType = Optional.ofNullable(thatType)
                 .map(ContentType::getMimeType)
                 .orElse(null);
         var thisMimeType = Optional.ofNullable(thisType)
                 .map(ContentType::getMimeType)
                 .orElse(null);
-        if(thatMimeType == null || thisMimeType == null){
+        if (thatMimeType == null || thisMimeType == null) {
             return false;
-        }else {
+        } else {
             return thatMimeType.equals(thisMimeType);
         }
     }

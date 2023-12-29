@@ -17,7 +17,7 @@ public abstract class ResponseMapping<T> {
     private final Type pojoType;
 
     public ResponseMapping() {
-        Type thisClass =this.getClass().getGenericSuperclass();
+        Type thisClass = this.getClass().getGenericSuperclass();
         if (thisClass instanceof Class) {
             throw new IllegalArgumentException("Internal error: TypeReference constructed without actual type information");
         } else {

@@ -6,12 +6,14 @@ import com.github.olson1998.http.HttpMethod;
 import org.apache.http.entity.ContentType;
 
 import java.net.URI;
-import java.time.Duration;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 public interface WebRequest {
+
+    static Builder builder() {
+        return new ClientHttpRequest.Builder();
+    }
 
     URI getUri();
 
@@ -25,11 +27,7 @@ public interface WebRequest {
 
     Map<String, Object> getAttributes();
 
-    static Builder builder(){
-        return new ClientHttpRequest.Builder();
-    }
-
-    interface Builder{
+    interface Builder {
 
         Builder uri(URI uri);
 

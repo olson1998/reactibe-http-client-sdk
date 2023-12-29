@@ -27,23 +27,23 @@ public class ImageDownload {
         this.imageRead = Optional.ofNullable(fileName)
                 .map(this::resolveImageExtension)
                 .map(extension -> new ImageRead(extension, bufferedImage))
-                .orElseGet(()-> new ImageRead(null, bufferedImage));
+                .orElseGet(() -> new ImageRead(null, bufferedImage));
     }
 
-    private Optional<String> resolveFileName(URI uri){
-        if(uri == null){
+    private Optional<String> resolveFileName(URI uri) {
+        if (uri == null) {
             return Optional.empty();
         }
         var path = uri.getPath();
         var fileName = StringUtils.substringAfterLast(path, "/");
-        if(!StringUtils.isBlank(fileName)){
+        if (!StringUtils.isBlank(fileName)) {
             return Optional.of(fileName);
-        }else {
+        } else {
             return Optional.empty();
         }
     }
 
-    private ImageExtension resolveImageExtension(String fileName){
+    private ImageExtension resolveImageExtension(String fileName) {
         var extensionValue = StringUtils.substringAfterLast(fileName, ".");
         return ImageExtension.findByExtension('.' + extensionValue)
                 .orElse(null);

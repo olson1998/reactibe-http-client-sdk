@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-public interface HttpHeaders extends Map<String, List<String>>{
+public interface HttpHeaders extends Map<String, List<String>> {
 
     List<HttpHeader> getHttpHeaderList();
 
@@ -22,7 +22,7 @@ public interface HttpHeaders extends Map<String, List<String>>{
 
     HttpHeaders readOnly();
 
-    static interface Builder{
+    static interface Builder {
 
         Builder nextHeader(HttpHeader httpHeader);
 

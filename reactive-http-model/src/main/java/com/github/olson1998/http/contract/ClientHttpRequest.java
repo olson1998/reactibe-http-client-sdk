@@ -4,7 +4,10 @@ import com.github.olson1998.http.Headers;
 import com.github.olson1998.http.HttpHeader;
 import com.github.olson1998.http.HttpHeaders;
 import com.github.olson1998.http.HttpMethod;
-import lombok.*;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
 import org.apache.http.entity.ContentType;
 
 import java.net.URI;
@@ -26,13 +29,17 @@ public class ClientHttpRequest implements WebRequest {
 
     private final Map<String, Object> attributes;
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
     @Override
     public Optional<ContentType> findContentType() {
-        if(httpHeaders.containsKey(CONTENT_TYPE)){
+        if (httpHeaders.containsKey(CONTENT_TYPE)) {
             return httpHeaders.get(CONTENT_TYPE).stream()
                     .map(ContentType::parse)
                     .findFirst();
-        }else {
+        } else {
             return Optional.empty();
         }
     }
@@ -43,7 +50,7 @@ public class ClientHttpRequest implements WebRequest {
         webRequest.append("\n").append(httpMethod);
         webRequest.append("\n").append(uri);
         var httpHeadersList = httpHeaders.getHttpHeaderList();
-        for(var httpHeader : httpHeadersList){
+        for (var httpHeader : httpHeadersList) {
             webRequest.append("\n").append(httpHeader.getKey());
             Optional.ofNullable(httpHeader.getValue()).ifPresent(value -> webRequest.append(": ").append(value));
         }
@@ -51,22 +58,14 @@ public class ClientHttpRequest implements WebRequest {
         return webRequest.toString();
     }
 
-    public static Builder builder(){
-        return new Builder();
-    }
-
     @NoArgsConstructor(access = AccessLevel.MODULE)
-    static class Builder implements WebRequest.Builder{
-
-        private URI uri;
-
-        private HttpMethod httpMethod;
+    static class Builder implements WebRequest.Builder {
 
         private final HttpHeaders httpHeaders = new Headers();
-
-        private Object body;
-
         private final Map<String, Object> attributes = new HashMap<>();
+        private URI uri;
+        private HttpMethod httpMethod;
+        private Object body;
 
         @Override
         public WebRequest.Builder uri(URI uri) {
@@ -94,10 +93,10 @@ public class ClientHttpRequest implements WebRequest {
 
         @Override
         public WebRequest.Builder addHttpHeaders(String httpHeader, Iterable<String> headerValues) {
-            if(this.httpHeaders.containsKey(httpHeader)){
+            if (this.httpHeaders.containsKey(httpHeader)) {
                 var httpHeaderValues = this.httpHeaders.get(httpHeader);
                 headerValues.forEach(httpHeaderValues::add);
-            }else {
+            } else {
                 var httpHeaderValues = new ArrayList<String>();
                 headerValues.forEach(httpHeaderValues::add);
                 this.httpHeaders.put(httpHeader, httpHeaderValues);

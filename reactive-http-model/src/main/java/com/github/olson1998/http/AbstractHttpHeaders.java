@@ -20,6 +20,22 @@ abstract class AbstractHttpHeaders implements HttpHeaders {
         this.httpHeaderList = new ArrayList<>();
     }
 
+    protected static <H extends HttpHeader> List<HttpHeader> writeHttpHeaders(List<H> httpHeaders) {
+        var httpHeaderList = new ArrayList<HttpHeader>();
+        for (HttpHeader httpHeader : httpHeaders) {
+            appendHttpHeader(httpHeaderList, httpHeader);
+        }
+        return httpHeaderList;
+    }
+
+    private static void appendHttpHeader(List<HttpHeader> httpHeaderList, HttpHeader httpHeader) {
+        var name = httpHeader.getKey();
+        var value = httpHeader.getValue();
+        if (httpHeaderList.stream().noneMatch(header -> header.getKey().equals(name) && header.getValue().equals(value))) {
+            httpHeaderList.add(httpHeader);
+        }
+    }
+
     @Override
     public String getFirstValue(String httpHeader) {
         return findFirstValue(httpHeader)
@@ -45,7 +61,7 @@ abstract class AbstractHttpHeaders implements HttpHeaders {
 
     @Override
     public void appendHttpHeader(HttpHeader httpHeader) {
-        if(httpHeaderList.stream().noneMatch(header -> header.getKey().equals(httpHeader.getKey()) && header.getValue().equals(httpHeader.getValue()))){
+        if (httpHeaderList.stream().noneMatch(header -> header.getKey().equals(httpHeader.getKey()) && header.getValue().equals(httpHeader.getValue()))) {
             httpHeaderList.add(httpHeader);
         }
     }
@@ -111,8 +127,8 @@ abstract class AbstractHttpHeaders implements HttpHeaders {
 
     @Override
     public void putAll(Map<? extends String, ? extends List<String>> m) {
-        m.forEach((header, values) -> values.forEach(value ->{
-            if(httpHeaderList.stream().noneMatch(httpHeader -> httpHeader.getKey().equals(header))){
+        m.forEach((header, values) -> values.forEach(value -> {
+            if (httpHeaderList.stream().noneMatch(httpHeader -> httpHeader.getKey().equals(header))) {
                 var httpHeader = new Header(header, value);
                 httpHeaderList.add(httpHeader);
             }
@@ -141,14 +157,14 @@ abstract class AbstractHttpHeaders implements HttpHeaders {
     @Override
     public Set<Entry<String, List<String>>> entrySet() {
         var headerEntries = new HashSet<Entry<String, List<String>>>();
-        for(HttpHeader httpHeader : httpHeaderList){
+        for (HttpHeader httpHeader : httpHeaderList) {
             var httpHeaderName = httpHeader.getKey();
-            if(containsHeaderEntry(headerEntries, httpHeaderName)){
+            if (containsHeaderEntry(headerEntries, httpHeaderName)) {
                 headerEntries.stream()
                         .filter(headerEntry -> headerEntry.getKey().equals(httpHeaderName))
                         .findFirst()
                         .ifPresent(headerEntry -> headerEntry.getValue().add(httpHeader.getValue()));
-            }else {
+            } else {
                 var values = new ArrayList<String>();
                 values.add(httpHeader.getValue());
                 Entry<String, List<String>> entry = Map.entry(httpHeaderName, values);
@@ -160,27 +176,11 @@ abstract class AbstractHttpHeaders implements HttpHeaders {
                 .collect(Collectors.toUnmodifiableSet());
     }
 
-    protected  static <H extends HttpHeader> List<HttpHeader> writeHttpHeaders(List<H> httpHeaders){
-        var httpHeaderList = new ArrayList<HttpHeader>();
-        for(HttpHeader httpHeader : httpHeaders){
-            appendHttpHeader(httpHeaderList, httpHeader);
-        }
-        return httpHeaderList;
-    }
-
-    private static void appendHttpHeader(List<HttpHeader> httpHeaderList, HttpHeader httpHeader){
-        var name = httpHeader.getKey();
-        var value = httpHeader.getValue();
-        if(httpHeaderList.stream().noneMatch(header -> header.getKey().equals(name) && header.getValue().equals(value))){
-            httpHeaderList.add(httpHeader);
-        }
-    }
-
-    private boolean containsHeaderEntry(Set<Entry<String, List<String>>> headerEntriesSet, String headerName){
+    private boolean containsHeaderEntry(Set<Entry<String, List<String>>> headerEntriesSet, String headerName) {
         return headerEntriesSet.stream().anyMatch(headerEntry -> headerEntry.getKey().equals(headerName));
     }
 
-    private Entry<String, List<String>> readOnlyHeader(Entry<String, List<String>> headerEntry){
+    private Entry<String, List<String>> readOnlyHeader(Entry<String, List<String>> headerEntry) {
         return Map.entry(headerEntry.getKey(), headerEntry.getValue().stream().toList());
     }
 

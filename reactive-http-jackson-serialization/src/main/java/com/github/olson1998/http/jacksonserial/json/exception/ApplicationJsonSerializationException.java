@@ -5,7 +5,7 @@ import org.apache.http.entity.ContentType;
 
 public class ApplicationJsonSerializationException extends ContentSerializationException {
 
-    public ApplicationJsonSerializationException(byte[] content,  ContentType contentType) {
+    public ApplicationJsonSerializationException(byte[] content, ContentType contentType) {
         super(null, content, contentType);
     }
 

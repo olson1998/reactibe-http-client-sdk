@@ -33,19 +33,19 @@ public class JsoupHtmlDeserializer implements ContentDeserializer {
         return (htmlBytes, context) -> doDeserializeTextHtml(htmlBytes, context, responseMapping.getPojoType());
     }
 
-    private <C> C doDeserializeTextHtml(byte[] htmlBytes, SerializationContext serializationContext, Type type){
-        if(type.equals(Document.class)){
+    private <C> C doDeserializeTextHtml(byte[] htmlBytes, SerializationContext serializationContext, Type type) {
+        if (type.equals(Document.class)) {
             return (C) doDeserializeTextHtml(htmlBytes, serializationContext);
-        }else {
+        } else {
             throw new SerializationException();
         }
     }
 
     private Document doDeserializeTextHtml(byte[] htmlBytes, SerializationContext serializationContext) {
         var charset = serializationContext.getContentType().getCharset();
-        try(var byteInputStream = new ByteArrayInputStream(htmlBytes)){
+        try (var byteInputStream = new ByteArrayInputStream(htmlBytes)) {
             return Jsoup.parse(byteInputStream, charset.name(), "");
-        }catch (IOException e){
+        } catch (IOException e) {
             return null;
         }
     }

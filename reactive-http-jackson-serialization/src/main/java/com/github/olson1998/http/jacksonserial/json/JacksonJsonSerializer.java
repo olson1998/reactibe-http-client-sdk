@@ -19,10 +19,10 @@ public class JacksonJsonSerializer extends AbstractJacksonJsonSerialization impl
         return this::doSerializeApplicationJson;
     }
 
-    private byte[] doSerializeApplicationJson(Object content, SerializationContext serializationContext){
-        try{
+    private byte[] doSerializeApplicationJson(Object content, SerializationContext serializationContext) {
+        try {
             return objectMapper.writeValueAsBytes(content);
-        }catch (IOException e){
+        } catch (IOException e) {
             throw new ApplicationJsonSerializationException(e, null, serializationContext.getContentType());
         }
     }

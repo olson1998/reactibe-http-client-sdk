@@ -21,7 +21,7 @@ public class ClientHttpResponse<C> implements WebResponse<C> {
         var webResponse = new StringBuilder();
         webResponse.append("\n").append(statusCode);
         var httpHeadersList = httpHeaders.getHttpHeaderList();
-        for(var httpHeader : httpHeadersList){
+        for (var httpHeader : httpHeadersList) {
             webResponse.append("\n").append(httpHeader.getKey());
             Optional.ofNullable(httpHeader.getValue()).ifPresent(headerValue -> webResponse.append(": ").append(headerValue));
         }

@@ -4,10 +4,8 @@ import com.github.olson1998.http.imageserial.exception.ImageDeserializationExcep
 import com.github.olson1998.http.serialization.ContentDeserializer;
 import com.github.olson1998.http.serialization.ResponseMapping;
 import com.github.olson1998.http.serialization.context.SerializationContext;
-import org.apache.http.entity.ContentType;
 
 import javax.imageio.ImageIO;
-import javax.imageio.ImageReader;
 import javax.imageio.stream.MemoryCacheImageInputStream;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
@@ -28,10 +26,10 @@ public class ImageContentDeserializer extends AbstractImageSerialization impleme
         return (imageBytes, context) -> doDeserializeImage(imageBytes, context, responseMapping.getPojoType());
     }
 
-    private <C> C doDeserializeImage(byte[] imageBytes, SerializationContext serializationContext, Type type){
-        if(type.equals(BufferedImage.class) || type.equals(RenderedImage.class)){
+    private <C> C doDeserializeImage(byte[] imageBytes, SerializationContext serializationContext, Type type) {
+        if (type.equals(BufferedImage.class) || type.equals(RenderedImage.class)) {
             return (C) doDeserialize(imageBytes, serializationContext);
-        }else {
+        } else {
             throw new ImageDeserializationException(
                     "Cannot create instance of: '%s' from image".formatted(type.getTypeName()),
                     imageBytes,
@@ -40,12 +38,12 @@ public class ImageContentDeserializer extends AbstractImageSerialization impleme
         }
     }
 
-    private BufferedImage doDeserialize(byte[] imageBytes, SerializationContext serializationContext){
+    private BufferedImage doDeserialize(byte[] imageBytes, SerializationContext serializationContext) {
         var contentType = serializationContext.getContentType();
-        try(var bytesInputStream = new ByteArrayInputStream(imageBytes)){
+        try (var bytesInputStream = new ByteArrayInputStream(imageBytes)) {
             var imageInputStream = new MemoryCacheImageInputStream(bytesInputStream);
             return ImageIO.read(imageInputStream);
-        }catch (IOException e){
+        } catch (IOException e) {
             throw new ImageDeserializationException("Failed to deserialize image", e, imageBytes, contentType);
         }
     }

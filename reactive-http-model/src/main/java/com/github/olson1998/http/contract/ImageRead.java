@@ -4,5 +4,5 @@ import com.github.olson1998.http.util.ImageExtension;
 
 import java.awt.image.BufferedImage;
 
-public record ImageRead (ImageExtension extension, BufferedImage image){
+public record ImageRead(ImageExtension extension, BufferedImage image) {
 }

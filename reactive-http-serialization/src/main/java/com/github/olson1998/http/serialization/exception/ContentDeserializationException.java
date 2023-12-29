@@ -6,7 +6,7 @@ import org.apache.http.entity.ContentType;
 import java.util.Optional;
 
 @Getter
-public class ContentDeserializationException extends RuntimeException{
+public class ContentDeserializationException extends RuntimeException {
 
     private static final String MESSAGE = "Failed to deserialize content of type: '%s', content length: %s";
 
@@ -32,7 +32,7 @@ public class ContentDeserializationException extends RuntimeException{
         this.contentType = contentType;
     }
 
-    private static String writeMessage(byte[] content, ContentType contentType, String message){
+    private static String writeMessage(byte[] content, ContentType contentType, String message) {
         var messageBuilder = new StringBuilder();
         var length = Optional.ofNullable(content)
                 .map(bytes -> bytes.length)

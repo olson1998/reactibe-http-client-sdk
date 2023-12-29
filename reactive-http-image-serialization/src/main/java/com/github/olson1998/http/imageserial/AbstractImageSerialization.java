@@ -6,7 +6,6 @@ import org.apache.http.entity.ContentType;
 import java.util.Set;
 
 import static org.apache.http.entity.ContentType.*;
-import static org.apache.http.entity.ContentType.IMAGE_WEBP;
 
 @Getter
 abstract class AbstractImageSerialization {
